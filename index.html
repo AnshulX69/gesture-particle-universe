@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gesture Particle Universe — X</title>
+<style>
+:root{--accent:#00d9ff;--panel:rgba(7,10,24,.66)}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Inter,Arial,sans-serif;color:#fff}
+canvas{position:fixed;inset:0;display:block}
+#ui{position:fixed;inset:0;pointer-events:none;z-index:10}
+.panel{pointer-events:auto;background:var(--panel);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(16px);box-shadow:0 18px 60px #0008}
+#hud{position:absolute;top:18px;left:18px;width:275px;border-radius:18px;padding:15px}
+.title{font-size:16px;font-weight:800;letter-spacing:.4px}
+.sub{font-size:11px;color:#9da9c8;margin-top:4px}
+.row{display:flex;justify-content:space-between;gap:10px;margin:9px 0;font-size:12px}
+kbd{background:#ffffff12;border:1px solid #ffffff18;padding:2px 6px;border-radius:5px}
+#controls{position:absolute;right:18px;top:18px;width:250px;border-radius:18px;padding:15px}
+button,select{border:1px solid #ffffff18;background:#ffffff0d;color:#fff;border-radius:10px;padding:8px 10px}
+button{cursor:pointer}
+button:hover{background:#ffffff18}
+#buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+#bottom{position:absolute;left:18px;bottom:18px;border-radius:16px;padding:10px 13px;font-size:11px;color:#aeb8d2}
+#cameraBox{position:absolute;right:18px;bottom:18px;width:180px;border-radius:15px;overflow:hidden;display:none}
+#cameraBox video{display:block;width:100%;transform:scaleX(-1);opacity:.78}
+#start{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:radial-gradient(circle at 50% 45%,#15245c 0,#050713 42%,#000 78%)}
+.card{width:min(620px,92vw);padding:34px;border-radius:28px;text-align:center;background:#080b1bd9;border:1px solid #ffffff18;box-shadow:0 30px 100px #000}
+.card h1{font-size:38px;margin:0 0 10px}
+.card p{color:#aab4d0;line-height:1.65}
+.primary{margin-top:15px;padding:13px 22px;border-radius:999px;background:linear-gradient(135deg,#6757ff,#00d9ff);font-weight:800}
+#toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:800;opacity:0;transition:.25s;text-shadow:0 5px 30px #000}
+#crosshair{position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #fff5;border-radius:50%;transform:translate(-50%,-50%)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="start"><div class="card">
+<h1>GESTURE PARTICLE UNIVERSE X</h1>
+<p>A real-time 3D particle playground controlled by your hand.<br>
+Pinch to breathe the universe, swipe decisively to morph it, open your palm to change energy color.</p>
+<button id="startBtn" class="primary">ENTER UNIVERSE + ENABLE CAMERA</button>
+<p style="font-size:11px">Camera frames are used locally by the page for gesture tracking; no upload feature is implemented.</p>
+</div></div>
+
+<div id="ui">
+ <div id="hud" class="panel">
+  <div class="title">PARTICLE UNIVERSE <span style="color:var(--accent)">X</span></div>
+  <div class="sub">REAL-TIME GESTURE ENGINE</div>
+  <div class="row"><span>Shape</span><b id="shape">Sphere</b></div>
+  <div class="row"><span>Gesture</span><b id="gesture">Waiting</b></div>
+  <div class="row"><span>Particles</span><b id="count">20,000</b></div>
+  <div class="row"><span>FPS</span><b id="fps">--</b></div>
+ </div>
+ <div id="controls" class="panel">
+  <div class="title">Control Deck</div>
+  <div id="buttons">
+   <button id="prev">◀ Shape</button><button id="next">Shape ▶</button>
+   <button id="color">Color</button><button id="burst">Burst</button>
+   <button id="random">Randomize</button><button id="reset">Reset</button>
+   <button id="camToggle">Camera</button><button id="auto">Auto: ON</button>
+  </div>
+ </div>
+ <div id="cameraBox" class="panel"><video id="video" autoplay playsinline muted></video></div>
+ <div id="bottom" class="panel">Pinch = scale · Open palm = color · Fast horizontal swipe = shape · Mouse = orbit · <kbd>Space</kbd> = burst · <kbd>R</kbd> = reset</div>
+ <div id="toast"></div><div id="crosshair"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170/build/three.module.js";
+
+const N=20000, TAU=Math.PI*2;
+const shapeNames=["Sphere","Galaxy","Torus","Heart","Flower","DNA","Saturn","Cube","Vortex"];
+const palettes=[
+ ["#6c5ce7","#00d9ff","#fff"],["#ff2fb3","#ff8a00","#fff"],
+ ["#50fa7b","#00d9ff","#b8ffea"],["#ffe066","#ff7b00","#fff"],
+ ["#c77dff","#7b61ff","#fff"],["#ff4d6d","#ffcad4","#fff"]
+];
+let scene,camera,renderer,geometry,material,points,clock=new THREE.Clock();
+let pos,target,vel,phase,shape=0,pal=0,scale=1,scaleT=1,auto=true;
+let hand=false,open=false,lastOpen=false,lastPalmX=null,lastPalmTime=0,swipeLock=0;
+let cameraStream=null,mpCamera=null,showCam=false;
+let mouseX=0,mouseY=0,burstEnergy=0;
+
+const $=id=>document.getElementById(id);
+const shapeEl=$("shape"),gestureEl=$("gesture"),fpsEl=$("fps");
+
+function toast(t){$("toast").textContent=t;$("toast").style.opacity=1;setTimeout(()=>$("toast").style.opacity=0,700)}
+function rand(a,b){return a+Math.random()*(b-a)}
+function setPalette(){
+ const p=palettes[pal], c1=new THREE.Color(p[0]), c2=new THREE.Color(p[1]);
+ material.userData.c1=c1; material.userData.c2=c2; material.userData.c3=new THREE.Color(p[2]);
+}
+function fillTarget(){
+ for(let i=0;i<N;i++){
+  const j=i*3; let x=0,y=0,z=0,u,a,r,t,b;
+  if(shape===0){u=rand(-1,1);a=Math.random()*TAU;r=Math.cbrt(Math.random())*10;let s=Math.sqrt(1-u*u);x=r*s*Math.cos(a);y=r*u;z=r*s*Math.sin(a)}
+  if(shape===1){let arm=i%6;r=Math.pow(Math.random(),.52)*14;a=arm*TAU/6+r*.62+rand(-.38,.38);x=Math.cos(a)*r;z=Math.sin(a)*r;y=rand(-1,1)*(1-r/15)*1.4}
+  if(shape===2){a=Math.random()*TAU;b=Math.random()*TAU;r=2.5;x=(7+r*Math.cos(b))*Math.cos(a);y=r*Math.sin(b);z=(7+r*Math.cos(b))*Math.sin(a)}
+  if(shape===3){t=Math.random()*TAU;let s=.48+Math.sqrt(Math.random())*.52;x=16*Math.sin(t)**3*s*.55;y=(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*s*.55;z=rand(-2.5,2.5)*s}
+  if(shape===4){t=Math.random()*TAU;r=9*Math.cos(5*t);x=r*Math.cos(t);y=r*Math.sin(t);z=rand(-1,1)*(2+5*Math.abs(Math.sin(5*t)))}
+  if(shape===5){t=rand(0,TAU);let q=rand(-8,8);x=3*Math.cos(t*4+q*.35);y=q;z=3*Math.sin(t*4+q*.35)}
+  if(shape===6){a=Math.random()*TAU;r=7+1.8*Math.cos(Math.random()*TAU);x=r*Math.cos(a);z=r*Math.sin(a);y=rand(-.65,.65)}
+  if(shape===7){x=rand(-7,7);y=rand(-7,7);z=rand(-7,7);let m=Math.max(Math.abs(x),Math.abs(y),Math.abs(z));x*=8/m;y*=8/m;z*=8/m}
+  if(shape===8){a=Math.random()*TAU;r=Math.pow(Math.random(),.5)*11;t=rand(-2.4,2.4);x=r*Math.cos(a+t*.8);z=r*Math.sin(a+t*.8);y=t*2.2}
+  target[j]=x;target[j+1]=y;target[j+2]=z;
+ }
+ shapeEl.textContent=shapeNames[shape];
+}
+function setShape(d){shape=(shape+d+shapeNames.length)%shapeNames.length;fillTarget();toast(shapeNames[shape]);}
+function burst(){
+ burstEnergy=1.0;
+ for(let i=0;i<N;i++){let j=i*3;vel[j]+=rand(-.09,.09);vel[j+1]+=rand(-.09,.09);vel[j+2]+=rand(-.09,.09)}
+ toast("BURST");
+}
+function reset(){scaleT=1;scale=1;mouseX=mouseY=0;fillTarget();toast("RESET")}
+
+function init(){
+ scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x000006,.018);
+ camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,1000);camera.position.z=30;
+ renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);document.body.appendChild(renderer.domElement);
+ geometry=new THREE.BufferGeometry();pos=new Float32Array(N*3);target=new Float32Array(N*3);vel=new Float32Array(N*3);phase=new Float32Array(N);
+ for(let i=0;i<N;i++){let j=i*3;pos[j]=rand(-.5,.5);pos[j+1]=rand(-.5,.5);pos[j+2]=rand(-.5,.5);phase[i]=Math.random()*TAU}
+ geometry.setAttribute("position",new THREE.BufferAttribute(pos,3));
+ material=new THREE.PointsMaterial({size:.07,sizeAttenuation:true,transparent:true,opacity:.88,blending:THREE.AdditiveBlending,depthWrite:false});
+ material.userData={c1:new THREE.Color(),c2:new THREE.Color(),c3:new THREE.Color()};
+ points=new THREE.Points(geometry,material);scene.add(points);
+ fillTarget();setPalette();
+ addStars();
+ window.onresize=()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)};
+ addEventListener("pointermove",e=>{mouseX=(e.clientX/innerWidth-.5)*2;mouseY=(e.clientY/innerHeight-.5)*2});
+}
+function addStars(){
+ const g=new THREE.BufferGeometry(),p=new Float32Array(1800*3);
+ for(let i=0;i<1800;i++){let r=rand(45,120),a=Math.random()*TAU,u=rand(-1,1),s=Math.sqrt(1-u*u);p[i*3]=r*s*Math.cos(a);p[i*3+1]=r*u;p[i*3+2]=r*s*Math.sin(a)}
+ g.setAttribute("position",new THREE.BufferAttribute(p,3));
+ scene.add(new THREE.Points(g,new THREE.PointsMaterial({size:.035,color:0x9fb7ff,transparent:true,opacity:.45})));
+}
+function animate(){
+ requestAnimationFrame(animate);const t=clock.getElapsedTime(),dt=Math.min(clock.getDelta(),.033);
+ scale+=(scaleT-scale)*.08;burstEnergy*=.94;
+ const a=geometry.attributes.position.array,c1=material.userData.c1,c2=material.userData.c2,c3=material.userData.c3;
+ for(let i=0;i<N;i++){let j=i*3, wob=Math.sin(t*1.7+phase[i])*.018;
+   let tx=target[j]*scale,ty=target[j+1]*scale,tz=target[j+2]*scale;
+   let dx=tx-a[j],dy=ty-a[j+1],dz=tz-a[j+2];
+   vel[j]+=dx*.0035;vel[j+1]+=dy*.0035;vel[j+2]+=dz*.0035;
+   vel[j]*=.92;vel[j+1]*=.92;vel[j+2]*=.92;
+   a[j]+=vel[j]+wob*.5;a[j+1]+=vel[j+1]+wob;a[j+2]+=vel[j+2]-wob*.3;
+   if(burstEnergy>.01){a[j]+=vel[j]*burstEnergy*2;a[j+1]+=vel[j+1]*burstEnergy*2;a[j+2]+=vel[j+2]*burstEnergy*2}
+ }
+ geometry.attributes.position.needsUpdate=true;
+ points.rotation.y+=.0018+mouseX*.0009;points.rotation.x+=(mouseY*.12-points.rotation.x)*.015;
+ if(auto)points.rotation.z=Math.sin(t*.18)*.04;
+ material.color.lerpColors(c1,c2,(Math.sin(t*.55)*.5+.5));
+ fpsEl.textContent=Math.round(1/dt);
+ swipeLock=Math.max(0,swipeLock-dt*1000);
+ renderer.render(scene,camera);
+}
+function palmOpen(lm){
+ const wrist=lm[0], tips=[8,12,16,20], pips=[6,10,14,18];
+ let n=0;for(let k=0;k<4;k++){let tip=Math.hypot(lm[tips[k]].x-wrist.x,lm[tips[k]].y-wrist.y),pip=Math.hypot(lm[pips[k]].x-wrist.x,lm[pips[k]].y-wrist.y);if(tip>pip*1.08)n++}
+ return n>=3;
+}
+function processHand(lm){
+ hand=true;const wrist=lm[0],thumb=lm[4],index=lm[8];
+ const pinch=Math.hypot(thumb.x-index.x,thumb.y-index.y);
+ scaleT=THREE.MathUtils.clamp(.55+pinch/.20*2.35,.55,3.25);
+ open=palmOpen(lm);
+ if(open&&!lastOpen){pal=(pal+1)%palettes.length;setPalette();toast("COLOR SHIFT")}
+ lastOpen=open;
+ const now=performance.now(),x=wrist.x;
+ if(lastPalmX!==null){
+   const dx=x-lastPalmX, dt=Math.max(16,now-lastPalmTime),speed=Math.abs(dx)/dt;
+   // Robust swipe: require both displacement AND horizontal speed, and reject near-stationary hands.
+   if(swipeLock<=0 && Math.abs(dx)>.055 && speed>.00032 && Math.abs(dx)>Math.abs((lm[0].y-(window._lastY??lm[0].y)))*1.35){
+      setShape(dx<0?1:-1);swipeLock=900;lastPalmX=null;lastPalmTime=now;window._lastY=lm[0].y;return;
+   }
+ }
+ lastPalmX=x;lastPalmTime=now;window._lastY=wrist.y;
+ gestureEl.textContent=open?"OPEN PALM":(pinch<.055?"PINCH":"TRACKING");
+}
+function noHand(){hand=false;gestureEl.textContent="No hand";lastPalmX=null;scaleT+=(1-scaleT)*.02}
+
+async function startCamera(){
+ $("startBtn").disabled=true;$("startBtn").textContent="INITIALIZING...";
+ try{
+   if(!navigator.mediaDevices?.getUserMedia)throw new Error("Camera API unavailable");
+   cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:"user"},audio:false});
+   video.srcObject=cameraStream;await video.play();
+   const hands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+   hands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:.65,minTrackingConfidence:.62});
+   hands.onResults(r=>r.multiHandLandmarks?.length?processHand(r.multiHandLandmarks[0]):noHand());
+   mpCamera=new Camera(video,{onFrame:async()=>{await hands.send({image:video})},width:1280,height:720});
+   await mpCamera.start();
+   $("start").remove();toast("UNIVERSE ONLINE");
+ }catch(e){console.error(e);$("startBtn").disabled=false;$("startBtn").textContent="TRY CAMERA AGAIN";alert("Camera could not start. Make sure your browser has camera permission for this page.\\n\\nError: "+e.name+" — "+e.message)}
+}
+$("startBtn").onclick=startCamera;
+$("prev").onclick=()=>setShape(-1);$("next").onclick=()=>setShape(1);$("color").onclick=()=>{pal=(pal+1)%palettes.length;setPalette()};
+$("burst").onclick=burst;$("random").onclick=()=>{for(let i=0;i<N;i++){let j=i*3;target[j]+=rand(-2,2);target[j+1]+=rand(-2,2);target[j+2]+=rand(-2,2)}toast("RANDOMIZED")};
+$("reset").onclick=reset;$("camToggle").onclick=()=>{$("cameraBox").style.display=showCam?"none":"block";showCam=!showCam};
+$("auto").onclick=()=>{auto=!auto;$("auto").textContent="Auto: "+(auto?"ON":"OFF")};
+addEventListener("keydown",e=>{if(e.code==="Space"){e.preventDefault();burst()}if(e.key.toLowerCase()==="r")reset();if(e.key==="ArrowLeft")setShape(-1);if(e.key==="ArrowRight")setShape(1)});
+init();animate();
+</script>
+</body>
+</html>
