@@ -3,477 +3,318 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gesture Particle Universe — Xtreme</title>
+<title>Gesture Particle Universe X — Extreme</title>
 
 <style>
 :root{
-  --accent:#00d9ff;
-  --panel:rgba(7,10,24,.68)
+    --accent:#00d9ff;
+    --panel:rgba(7,10,24,.72);
 }
 
 *{
-  box-sizing:border-box
+    box-sizing:border-box;
 }
 
 html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#000;
-  font-family:Inter,Arial,sans-serif;
-  color:#fff
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    font-family:Inter,Arial,sans-serif;
+    color:#fff;
 }
 
 canvas{
-  position:fixed;
-  inset:0;
-  display:block
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    z-index:1;
 }
 
 #ui{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:10
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:10;
 }
 
 .panel{
-  pointer-events:auto;
-  background:var(--panel);
-  border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(16px);
-  box-shadow:0 18px 60px #0008
+    pointer-events:auto;
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(16px);
+    box-shadow:0 18px 60px #0008;
 }
 
 #hud{
-  position:absolute;
-  top:18px;
-  left:18px;
-  width:300px;
-  border-radius:18px;
-  padding:15px
+    position:absolute;
+    top:18px;
+    left:18px;
+    width:285px;
+    border-radius:18px;
+    padding:15px;
 }
 
 .title{
-  font-size:16px;
-  font-weight:800;
-  letter-spacing:.4px
+    font-size:16px;
+    font-weight:800;
+    letter-spacing:.5px;
 }
 
 .sub{
-  font-size:11px;
-  color:#9da9c8;
-  margin-top:4px
+    font-size:11px;
+    color:#9da9c8;
+    margin-top:4px;
 }
 
 .row{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin:8px 0;
-  font-size:12px
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin:9px 0;
+    font-size:12px;
 }
 
 kbd{
-  background:#ffffff12;
-  border:1px solid #ffffff18;
-  padding:2px 6px;
-  border-radius:5px
+    background:#ffffff12;
+    border:1px solid #ffffff18;
+    padding:2px 6px;
+    border-radius:5px;
 }
 
 #controls{
-  position:absolute;
-  right:18px;
-  top:18px;
-  width:285px;
-  max-height:calc(100vh - 36px);
-  overflow:auto;
-  border-radius:18px;
-  padding:15px
-}
-
-button,select{
-  border:1px solid #ffffff18;
-  background:#ffffff0d;
-  color:#fff;
-  border-radius:10px;
-  padding:8px 10px
+    position:absolute;
+    right:18px;
+    top:18px;
+    width:260px;
+    border-radius:18px;
+    padding:15px;
 }
 
 button{
-  cursor:pointer
+    border:1px solid #ffffff18;
+    background:#ffffff0d;
+    color:#fff;
+    border-radius:10px;
+    padding:8px 10px;
+    cursor:pointer;
 }
 
 button:hover{
-  background:#ffffff18
-}
-
-button.active{
-  background:#ffffff20;
-  border-color:#ffffff40
+    background:#ffffff1c;
 }
 
 #buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-  margin-top:10px
-}
-
-.section{
-  margin-top:12px;
-  padding-top:10px;
-  border-top:1px solid #ffffff12;
-  font-size:11px;
-  color:#aeb8d2
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin-top:10px;
 }
 
 #bottom{
-  position:absolute;
-  left:18px;
-  bottom:18px;
-  max-width:min(720px,calc(100vw - 36px));
-  border-radius:16px;
-  padding:10px 13px;
-  font-size:11px;
-  color:#aeb8d2
+    position:absolute;
+    left:18px;
+    bottom:18px;
+    border-radius:16px;
+    padding:10px 13px;
+    font-size:11px;
+    color:#aeb8d2;
+    max-width:620px;
 }
 
 #cameraBox{
-  position:absolute;
-  right:18px;
-  bottom:18px;
-  width:200px;
-  border-radius:15px;
-  overflow:hidden;
-  display:none
+    position:absolute;
+    right:18px;
+    bottom:18px;
+    width:190px;
+    border-radius:15px;
+    overflow:hidden;
+    display:none;
 }
 
 #cameraBox video{
-  display:block;
-  width:100%;
-  transform:scaleX(-1);
-  opacity:.78
+    display:block;
+    width:100%;
+    transform:scaleX(-1);
+    opacity:.78;
 }
 
 #start{
-  position:fixed;
-  inset:0;
-  z-index:50;
-  display:grid;
-  place-items:center;
-  background:
-    radial-gradient(
-      circle at 50% 45%,
-      #15245c 0,
-      #050713 42%,
-      #000 78%
-    )
+    position:fixed;
+    inset:0;
+    z-index:50;
+    display:grid;
+    place-items:center;
+    background:
+        radial-gradient(circle at 50% 45%,#15245c 0,#050713 42%,#000 78%);
 }
 
 .card{
-  width:min(680px,92vw);
-  padding:34px;
-  border-radius:28px;
-  text-align:center;
-  background:#080b1bd9;
-  border:1px solid #ffffff18;
-  box-shadow:0 30px 100px #000
+    width:min(650px,92vw);
+    padding:34px;
+    border-radius:28px;
+    text-align:center;
+    background:#080b1bd9;
+    border:1px solid #ffffff18;
+    box-shadow:0 30px 100px #000;
 }
 
 .card h1{
-  font-size:38px;
-  margin:0 0 10px
+    font-size:38px;
+    margin:0 0 10px;
 }
 
 .card p{
-  color:#aab4d0;
-  line-height:1.65
+    color:#aab4d0;
+    line-height:1.65;
 }
 
 .primary{
-  margin-top:15px;
-  padding:13px 22px;
-  border-radius:999px;
-  background:linear-gradient(135deg,#6757ff,#00d9ff);
-  font-weight:800
+    margin-top:15px;
+    padding:13px 22px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#6757ff,#00d9ff);
+    font-weight:800;
 }
 
 #toast{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  font-size:28px;
-  font-weight:800;
-  opacity:0;
-  transition:.25s;
-  text-shadow:0 5px 30px #000;
-  pointer-events:none
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:28px;
+    font-weight:800;
+    opacity:0;
+    transition:.25s;
+    text-shadow:0 5px 30px #000;
 }
 
 #crosshair{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:8px;
-  height:8px;
-  border:1px solid #fff5;
-  border-radius:50%;
-  transform:translate(-50%,-50%)
-}
-
-#mode{
-  font-size:11px;
-  color:#8fe9ff;
-  margin-top:7px
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:8px;
+    height:8px;
+    border:1px solid #fff5;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
 }
 
 .hidden{
-  display:none!important
+    display:none!important;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ============================================================
-     START SCREEN
-     ============================================================ -->
-
 <div id="start">
+    <div class="card">
+        <h1>GESTURE PARTICLE UNIVERSE X</h1>
 
-  <div class="card">
+        <p>
+            A real-time 3D particle universe controlled by your hand.
+            <br><br>
+            Pinch → expand / contract<br>
+            Open palm → change energy<br>
+            Horizontal swipe → change shape<br>
+            Vertical swipe → move universe
+        </p>
 
-    <h1>GESTURE PARTICLE UNIVERSE X</h1>
+        <button id="startBtn" class="primary">
+            ENTER UNIVERSE + ENABLE CAMERA
+        </button>
 
-    <p>
-      A real-time 3D particle playground controlled by your hands.
-      Pinch to scale, move your hand to move the universe,
-      point to pull particles, swipe to morph,
-      and use two hands for expansion.
-    </p>
-
-    <button id="startBtn" class="primary">
-      ENTER UNIVERSE + ENABLE CAMERA
-    </button>
-
-    <p style="font-size:11px">
-      Camera and optional microphone data are processed locally
-      by this page. No upload feature is implemented.
-    </p>
-
-  </div>
-
+        <p style="font-size:11px">
+            Camera frames are processed locally by the page.
+        </p>
+    </div>
 </div>
-
-
-<!-- ============================================================
-     USER INTERFACE
-     ============================================================ -->
 
 <div id="ui">
 
-  <div id="hud" class="panel">
+    <div id="hud" class="panel">
+        <div class="title">
+            PARTICLE UNIVERSE
+            <span style="color:var(--accent)">X</span>
+        </div>
 
-    <div class="title">
-      PARTICLE UNIVERSE
-      <span style="color:var(--accent)">X</span>
+        <div class="sub">
+            EXTREME GESTURE ENGINE
+        </div>
+
+        <div class="row">
+            <span>Shape</span>
+            <b id="shape">Sphere</b>
+        </div>
+
+        <div class="row">
+            <span>Gesture</span>
+            <b id="gesture">Waiting</b>
+        </div>
+
+        <div class="row">
+            <span>Particles</span>
+            <b id="count">25,000</b>
+        </div>
+
+        <div class="row">
+            <span>FPS</span>
+            <b id="fps">--</b>
+        </div>
+
+        <div class="row">
+            <span>Hand</span>
+            <b id="hand">OFF</b>
+        </div>
     </div>
 
-    <div class="sub">
-      EXTREME GESTURE ENGINE
+    <div id="controls" class="panel">
+
+        <div class="title">
+            CONTROL DECK
+        </div>
+
+        <div id="buttons">
+
+            <button id="prev">◀ Shape</button>
+            <button id="next">Shape ▶</button>
+
+            <button id="color">Color</button>
+            <button id="burst">Burst</button>
+
+            <button id="random">Randomize</button>
+            <button id="reset">Reset</button>
+
+            <button id="camToggle">Camera</button>
+            <button id="auto">Auto: ON</button>
+
+        </div>
     </div>
 
-    <div class="row">
-      <span>Shape</span>
-      <b id="shape">Sphere</b>
+    <div id="cameraBox" class="panel">
+        <video id="video" autoplay playsinline muted></video>
     </div>
 
-    <div class="row">
-      <span>Gesture</span>
-      <b id="gesture">Waiting</b>
+    <div id="bottom" class="panel">
+        Pinch = scale · Open palm = color ·
+        Swipe = shape · Vertical swipe = move ·
+        Mouse = interaction ·
+        <kbd>Space</kbd> = burst ·
+        <kbd>R</kbd> = reset
     </div>
 
-    <div class="row">
-      <span>Mode</span>
-      <b id="mode">MOVE</b>
-    </div>
+    <div id="toast"></div>
 
-    <div class="row">
-      <span>Particles</span>
-      <b id="count">20,000</b>
-    </div>
-
-    <div class="row">
-      <span>FPS</span>
-      <b id="fps">--</b>
-    </div>
-
-    <div class="row">
-      <span>Effects</span>
-      <b id="effects">NORMAL</b>
-    </div>
-
-  </div>
-
-
-  <!-- ============================================================
-       CONTROL DECK
-       ============================================================ -->
-
-  <div id="controls" class="panel">
-
-    <div class="title">
-      Control Deck
-    </div>
-
-    <div id="buttons">
-
-      <button id="prev">
-        ◀ Shape
-      </button>
-
-      <button id="next">
-        Shape ▶
-      </button>
-
-      <button id="color">
-        Color
-      </button>
-
-      <button id="burst">
-        Supernova
-      </button>
-
-      <button id="random">
-        Randomize
-      </button>
-
-      <button id="reset">
-        Reset
-      </button>
-
-      <button id="blackHole">
-        Black Hole
-      </button>
-
-      <button id="gravity">
-        Gravity
-      </button>
-
-      <button id="force">
-        Force Field
-      </button>
-
-      <button id="nebula">
-        Nebula
-      </button>
-
-      <button id="audio">
-        Audio
-      </button>
-
-      <button id="trails">
-        Trails
-      </button>
-
-      <button id="collision">
-        Collisions
-      </button>
-
-      <button id="environment">
-        Environment
-      </button>
-
-      <button id="cinematic">
-        Cinematic
-      </button>
-
-      <button id="performance">
-        20K: NORMAL
-      </button>
-
-      <button id="auto">
-        Auto: ON
-      </button>
-
-      <button id="camToggle">
-        Camera
-      </button>
-
-      <button id="modeBtn">
-        Mode: MOVE
-      </button>
-
-    </div>
-
-    <div class="section">
-
-      Keyboard:
-      <kbd>Space</kbd> burst ·
-      <kbd>R</kbd> reset ·
-      <kbd>←</kbd><kbd>→</kbd> shape ·
-      <kbd>M</kbd> mode ·
-      <kbd>B</kbd> black hole
-
-    </div>
-
-  </div>
-
-
-  <!-- CAMERA PREVIEW -->
-
-  <div id="cameraBox" class="panel">
-
-    <video
-      id="video"
-      autoplay
-      playsinline
-      muted>
-    </video>
-
-  </div>
-
-
-  <!-- HELP -->
-
-  <div id="bottom" class="panel">
-
-    Pinch = scale ·
-    Open palm = color ·
-    Index = attract ·
-    Fist = freeze ·
-    Swipe = shape/flip ·
-    Hand position = move ·
-    Wrist = rotate ·
-    Two hands = expand/compress ·
-    Audio = microphone-reactive ·
-    Performance = 20K/35K/50K
-
-  </div>
-
-
-  <div id="toast"></div>
-
-  <div id="crosshair"></div>
+    <div id="crosshair"></div>
 
 </div>
 
-
-<!-- ============================================================
-     MEDIAPIPE
-     ============================================================ -->
-
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-
-
-<!-- ============================================================
-     MAIN JAVASCRIPT
-     ============================================================ -->
 
 <script type="module">
 
@@ -481,4035 +322,1616 @@ import * as THREE from
 "https://cdn.jsdelivr.net/npm/three@0.170/build/three.module.js";
 
 
-/* ============================================================
-   CORE SETTINGS
-   ============================================================ */
+/* =========================================================
+   BASIC SETTINGS
+========================================================= */
 
+const N = 25000;
 const TAU = Math.PI * 2;
 
-const MAX_PARTICLES = 50000;
-
-let particleCount = 20000;
-
-
-/* ============================================================
-   SHAPES
-   ============================================================ */
-
 const shapeNames = [
-
-  "Sphere",
-  "Galaxy",
-  "Torus",
-  "Heart",
-  "Flower",
-  "DNA",
-  "Saturn",
-  "Cube",
-  "Vortex",
-  "Nebula"
-
+    "Sphere",
+    "Galaxy",
+    "Torus",
+    "Heart",
+    "Flower",
+    "DNA",
+    "Saturn",
+    "Cube",
+    "Vortex"
 ];
-
-
-/* ============================================================
-   COLOR PALETTES
-   ============================================================ */
 
 const palettes = [
 
-  ["#6c5ce7","#00d9ff","#ffffff"],
-
-  ["#ff2fb3","#ff8a00","#ffffff"],
-
-  ["#50fa7b","#00d9ff","#b8ffea"],
-
-  ["#ffe066","#ff7b00","#ffffff"],
-
-  ["#c77dff","#7b61ff","#ffffff"],
-
-  ["#ff4d6d","#ffcad4","#ffffff"]
+    ["#6c5ce7","#00d9ff","#ffffff"],
+    ["#ff2fb3","#ff8a00","#ffffff"],
+    ["#50fa7b","#00d9ff","#b8ffea"],
+    ["#ffe066","#ff7b00","#ffffff"],
+    ["#c77dff","#7b61ff","#ffffff"],
+    ["#ff4d6d","#ffcad4","#ffffff"]
 
 ];
 
 
-/* ============================================================
-   ENVIRONMENTS
-   ============================================================ */
-
-const environments = [
-
-  {
-    bg:0x000000,
-    fog:0x000006
-  },
-
-  {
-    bg:0x071426,
-    fog:0x061020
-  },
-
-  {
-    bg:0x18051d,
-    fog:0x160014
-  },
-
-  {
-    bg:0x061a13,
-    fog:0x00100a
-  }
-
-];
-
-
-/* ============================================================
+/* =========================================================
    THREE.JS VARIABLES
-   ============================================================ */
+========================================================= */
 
 let scene;
-
 let camera;
-
 let renderer;
 
 let geometry;
-
 let material;
-
 let points;
 
-let starField;
+let positionArray;
+let targetArray;
+let velocityArray;
+let phaseArray;
+
+let colorArray;
 
 let clock = new THREE.Clock();
 
-
-/* ============================================================
-   PARTICLE ARRAYS
-   ============================================================ */
-
-let pos;
-
-let target;
-
-let vel;
-
-let phase;
-
-let previousPositions;
-
-let trailPositions1;
-
-let trailPositions2;
-
-
-/* ============================================================
-   TRAIL OBJECTS
-   ============================================================ */
-
-let trailGeometry1;
-
-let trailGeometry2;
-
-let trailPoints1;
-
-let trailPoints2;
-
-
-/* ============================================================
-   BASIC STATE
-   ============================================================ */
-
 let shape = 0;
-
-let pal = 0;
+let paletteIndex = 0;
 
 let scale = 1;
+let scaleTarget = 1;
 
-let scaleT = 1;
+let universeX = 0;
+let universeY = 0;
+
+let targetUniverseX = 0;
+let targetUniverseY = 0;
 
 let auto = true;
 
+let burstEnergy = 0;
 
-/* ============================================================
-   HAND STATE
-   ============================================================ */
+let mouseX = 0;
+let mouseY = 0;
 
-let hand = false;
-
-let open = false;
-
-let lastOpen = false;
-
-let handCount = 0;
-
-
-/* ============================================================
-   SWIPE STATE
-   ============================================================ */
+let handDetected = false;
+let palmOpen = false;
+let lastPalmOpen = false;
 
 let lastPalmX = null;
-
 let lastPalmY = null;
-
-let lastPalmZ = null;
 
 let lastPalmTime = 0;
 
 let swipeLock = 0;
 
-
-/* ============================================================
-   GESTURE STATE
-   ============================================================ */
-
-let gestureState = "NONE";
-
-let previousGesture = "NONE";
-
-
-/* ============================================================
-   CONTROL MODES
-   ============================================================ */
-
-let controlMode = 0;
-
-const controlModes = [
-
-  "MOVE",
-  "ROTATE",
-  "FORCE",
-  "GRAB"
-
-];
-
-
-/* ============================================================
-   HAND POSITION
-   ============================================================ */
-
-let handX = 0;
-
-let handY = 0;
-
-let handZ = 0;
-
-
-/* ============================================================
-   HAND VELOCITY
-   ============================================================ */
-
-let handVX = 0;
-
-let handVY = 0;
-
-let handVZ = 0;
-
-
-/* ============================================================
-   ROTATION
-   ============================================================ */
-
-let wristAngle = 0;
-
-let lastWristAngle = 0;
-
-let universeX = 0;
-
-let universeY = 0;
-
-let universeZ = 0;
-
-let rotationTargetX = 0;
-
-let rotationTargetY = 0;
-
-let rotationTargetZ = 0;
-
-
-/* ============================================================
-   CAMERA
-   ============================================================ */
-
 let cameraStream = null;
-
 let mpCamera = null;
 
-let showCam = false;
+let showCamera = false;
 
 
-/* ============================================================
-   MOUSE
-   ============================================================ */
+/* =========================================================
+   DOM
+========================================================= */
 
-let mouseX = 0;
-
-let mouseY = 0;
-
-
-/* ============================================================
-   EFFECT STATES
-   ============================================================ */
-
-let burstEnergy = 0;
-
-let freeze = false;
-
-let blackHole = false;
-
-let gravityEnabled = true;
-
-let forceFieldEnabled = false;
-
-let nebulaMode = false;
-
-let trailsEnabled = true;
-
-let collisionsEnabled = false;
-
-let cinematic = false;
-
-let environmentIndex = 0;
-
-
-/* ============================================================
-   PERFORMANCE MODES
-   ============================================================ */
-
-let performanceMode = 0;
-
-const performanceCounts = [
-
-  20000,
-  35000,
-  50000
-
-];
-
-
-/* ============================================================
-   GRAVITY WELL
-   ============================================================ */
-
-let gravityWell = {
-
-  active:false,
-
-  x:0,
-
-  y:0,
-
-  z:0,
-
-  strength:.018
-
-};
-
-
-/* ============================================================
-   FINGERTIP
-   ============================================================ */
-
-let fingertip = {
-
-  active:false,
-
-  x:0,
-
-  y:0,
-
-  z:0
-
-};
-
-
-/* ============================================================
-   FORCE FIELD
-   ============================================================ */
-
-let forceField = {
-
-  strength:.018
-
-};
-
-
-/* ============================================================
-   COLLISION
-   ============================================================ */
-
-let collisionStrength = .0009;
-
-
-/* ============================================================
-   MORPHING
-   ============================================================ */
-
-let morphActive = false;
-
-let morphAmount = 1;
-
-let morphFrom = new Float32Array(
-  MAX_PARTICLES * 3
-);
-
-let morphTo = new Float32Array(
-  MAX_PARTICLES * 3
-);
-
-
-/* ============================================================
-   AUDIO
-   ============================================================ */
-
-let audioContext = null;
-
-let analyser = null;
-
-let audioData = null;
-
-let audioLevel = 0;
-
-
-/* ============================================================
-   FRAME COUNTER
-   ============================================================ */
-
-let frameCounter = 0;
-
-
-/* ============================================================
-   DOM REFERENCES
-   ============================================================ */
-
-const $ = id =>
-  document.getElementById(id);
+const $ = id => document.getElementById(id);
 
 const shapeEl = $("shape");
-
 const gestureEl = $("gesture");
-
 const fpsEl = $("fps");
-
-const modeEl = $("mode");
-
-const effectsEl = $("effects");
-
-const countEl = $("count");
+const handEl = $("hand");
 
 
-/* ============================================================
-   TOAST
-   ============================================================ */
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function rand(a,b){
+    return a + Math.random() * (b-a);
+}
 
 function toast(text){
 
-  $("toast").textContent = text;
+    const el = $("toast");
 
-  $("toast").style.opacity = 1;
+    el.textContent = text;
+    el.style.opacity = 1;
 
-  clearTimeout(window._toastTimer);
-
-  window._toastTimer =
-    setTimeout(
-      () => $("toast").style.opacity = 0,
-      800
-    );
-
+    setTimeout(()=>{
+        el.style.opacity = 0;
+    },700);
 }
 
 
-/* ============================================================
-   RANDOM
-   ============================================================ */
-
-function rand(a,b){
-
-  return a + Math.random() * (b-a);
-
-}
-
-
-/* ============================================================
-   CLAMP
-   ============================================================ */
-
-function clamp(v,a,b){
-
-  return Math.max(
-    a,
-    Math.min(b,v)
-  );
-
-}
-
-
-/* ============================================================
-   BUTTON STATE
-   ============================================================ */
-
-function setButton(id,active){
-
-  $(id).classList.toggle(
-    "active",
-    active
-  );
-
-}
-
-
-/* ============================================================
-   EFFECT DISPLAY
-   ============================================================ */
-
-function updateEffects(){
-
-  const a = [];
-
-  if(blackHole)
-    a.push("BLACK HOLE");
-
-  if(gravityEnabled)
-    a.push("GRAVITY");
-
-  if(forceFieldEnabled)
-    a.push("FIELD");
-
-  if(trailsEnabled)
-    a.push("TRAILS");
-
-  if(collisionsEnabled)
-    a.push("COLLISION");
-
-  if(audioContext)
-    a.push("AUDIO");
-
-  effectsEl.textContent =
-    a.length
-      ? a.join(" · ")
-      : "NORMAL";
-
-}
-
-
-/* ============================================================
+/* =========================================================
    PALETTE
-   ============================================================ */
+========================================================= */
 
 function setPalette(){
 
-  const p = palettes[pal];
+    const palette = palettes[paletteIndex];
 
-  material.userData.c1 =
-    new THREE.Color(p[0]);
+    const c1 = new THREE.Color(palette[0]);
+    const c2 = new THREE.Color(palette[1]);
+    const c3 = new THREE.Color(palette[2]);
 
-  material.userData.c2 =
-    new THREE.Color(p[1]);
+    for(let i=0;i<N;i++){
 
-  material.userData.c3 =
-    new THREE.Color(p[2]);
+        const j = i * 3;
 
+        const mix = Math.random();
+
+        let c;
+
+        if(mix < .5){
+
+            c = c1.clone().lerp(c2,mix*2);
+
+        }else{
+
+            c = c2.clone().lerp(c3,(mix-.5)*2);
+
+        }
+
+        colorArray[j] = c.r;
+        colorArray[j+1] = c.g;
+        colorArray[j+2] = c.b;
+    }
+
+    geometry.attributes.color.needsUpdate = true;
 }
 
 
-/* ============================================================
-   COLOR CHANGE
-   ============================================================ */
+/* =========================================================
+   PARTICLE SHAPES
+========================================================= */
 
-function cycleColor(){
+function fillTarget(){
 
-  pal =
-    (pal + 1) %
-    palettes.length;
+    for(let i=0;i<N;i++){
 
-  setPalette();
+        const j = i*3;
 
-  toast("COLOR SHIFT");
+        let x=0;
+        let y=0;
+        let z=0;
 
+        let u;
+        let a;
+        let r;
+        let t;
+        let b;
+
+
+        /* SPHERE */
+
+        if(shape===0){
+
+            u = rand(-1,1);
+            a = Math.random()*TAU;
+
+            r = Math.cbrt(Math.random())*10;
+
+            const s = Math.sqrt(1-u*u);
+
+            x = r*s*Math.cos(a);
+            y = r*u;
+            z = r*s*Math.sin(a);
+        }
+
+
+        /* GALAXY */
+
+        if(shape===1){
+
+            const arm = i%6;
+
+            r = Math.pow(Math.random(),.52)*15;
+
+            a =
+                arm*TAU/6 +
+                r*.62 +
+                rand(-.45,.45);
+
+            x = Math.cos(a)*r;
+            z = Math.sin(a)*r;
+
+            y =
+                rand(-1,1) *
+                (1-r/16) *
+                1.5;
+        }
+
+
+        /* TORUS */
+
+        if(shape===2){
+
+            a = Math.random()*TAU;
+            b = Math.random()*TAU;
+
+            r = 2.8;
+
+            x = (7+r*Math.cos(b))*Math.cos(a);
+            y = r*Math.sin(b);
+            z = (7+r*Math.cos(b))*Math.sin(a);
+        }
+
+
+        /* HEART */
+
+        if(shape===3){
+
+            t = Math.random()*TAU;
+
+            const s =
+                .48 +
+                Math.sqrt(Math.random())*.52;
+
+            x =
+                16*Math.sin(t)**3*s*.55;
+
+            y =
+                (
+                    13*Math.cos(t)
+                    -5*Math.cos(2*t)
+                    -2*Math.cos(3*t)
+                    -Math.cos(4*t)
+                )*s*.55;
+
+            z =
+                rand(-2.5,2.5)*s;
+        }
+
+
+        /* FLOWER */
+
+        if(shape===4){
+
+            t = Math.random()*TAU;
+
+            r = 9*Math.cos(5*t);
+
+            x = r*Math.cos(t);
+            y = r*Math.sin(t);
+
+            z =
+                rand(-1,1) *
+                (2+5*Math.abs(Math.sin(5*t)));
+        }
+
+
+        /* DNA */
+
+        if(shape===5){
+
+            t = rand(0,TAU);
+
+            const q = rand(-9,9);
+
+            x =
+                3*Math.cos(t*4+q*.35);
+
+            y = q;
+
+            z =
+                3*Math.sin(t*4+q*.35);
+        }
+
+
+        /* SATURN */
+
+        if(shape===6){
+
+            a = Math.random()*TAU;
+
+            r =
+                7+
+                1.8*Math.cos(Math.random()*TAU);
+
+            x = r*Math.cos(a);
+            z = r*Math.sin(a);
+
+            y = rand(-.7,.7);
+        }
+
+
+        /* CUBE */
+
+        if(shape===7){
+
+            x = rand(-7,7);
+            y = rand(-7,7);
+            z = rand(-7,7);
+
+            const m =
+                Math.max(
+                    Math.abs(x),
+                    Math.abs(y),
+                    Math.abs(z)
+                );
+
+            x *= 8/m;
+            y *= 8/m;
+            z *= 8/m;
+        }
+
+
+        /* VORTEX */
+
+        if(shape===8){
+
+            a = Math.random()*TAU;
+
+            r =
+                Math.pow(Math.random(),.5)*12;
+
+            t = rand(-2.6,2.6);
+
+            x =
+                r*Math.cos(a+t*.8);
+
+            z =
+                r*Math.sin(a+t*.8);
+
+            y =
+                t*2.3;
+        }
+
+
+        targetArray[j] = x;
+        targetArray[j+1] = y;
+        targetArray[j+2] = z;
+    }
+
+    shapeEl.textContent =
+        shapeNames[shape];
 }
 
 
-/* ============================================================
-   PERFORMANCE MODE
-   ============================================================ */
-
-function setPerformanceMode(){
-
-  performanceMode =
-    (performanceMode + 1) %
-    performanceCounts.length;
-
-  particleCount =
-    performanceCounts[performanceMode];
-
-
-  generateShape(
-    target,
-    shape
-  );
-
-
-  morphFrom.set(target);
-
-  morphTo.set(target);
-
-
-  for(
-    let i=0;
-    i<MAX_PARTICLES;
-    i++
-  ){
-
-    const j=i*3;
-
-    if(i>=particleCount){
-
-      pos[j] = 0;
-
-      pos[j+1] = 0;
-
-      pos[j+2] = 0;
-
-      vel[j] = 0;
-
-      vel[j+1] = 0;
-
-      vel[j+2] = 0;
-
-    }
-
-  }
-
-
-  geometry.setDrawRange(
-    0,
-    particleCount
-  );
-
-  trailGeometry1.setDrawRange(
-    0,
-    particleCount
-  );
-
-  trailGeometry2.setDrawRange(
-    0,
-    particleCount
-  );
-
-
-  $("performance").textContent =
-    performanceCounts[performanceMode]/1000 +
-    "K: " +
-    (
-      performanceMode === 0
-        ? "NORMAL"
-        : performanceMode === 1
-          ? "HIGH"
-          : "EXTREME"
-    );
-
-
-  toast(
-    "PERFORMANCE: " +
-    particleCount.toLocaleString()
-  );
-
-}
-
-
-/* ============================================================
-   SHAPE GENERATION
-   ============================================================ */
-
-function generateShape(
-  out,
-  shapeIndex
-){
-
-  for(
-    let i=0;
-    i<particleCount;
-    i++
-  ){
-
-    const j=i*3;
-
-    let x=0;
-
-    let y=0;
-
-    let z=0;
-
-    let u;
-
-    let a;
-
-    let r;
-
-    let t;
-
-    let b;
-
-    let q;
-
-
-    /* SPHERE */
-
-    if(shapeIndex===0){
-
-      u=rand(-1,1);
-
-      a=Math.random()*TAU;
-
-      r=
-        Math.cbrt(
-          Math.random()
-        )*10;
-
-      const s=
-        Math.sqrt(1-u*u);
-
-      x=
-        r*s*Math.cos(a);
-
-      y=
-        r*u;
-
-      z=
-        r*s*Math.sin(a);
-
-    }
-
-
-    /* GALAXY */
-
-    if(shapeIndex===1){
-
-      const arm=i%6;
-
-      r=
-        Math.pow(
-          Math.random(),
-          .52
-        )*14;
-
-      a=
-        arm*TAU/6 +
-        r*.62 +
-        rand(-.38,.38);
-
-      x=
-        Math.cos(a)*r;
-
-      z=
-        Math.sin(a)*r;
-
-      y=
-        rand(-1,1)*
-        (1-r/15)*
-        1.4;
-
-    }
-
-
-    /* TORUS */
-
-    if(shapeIndex===2){
-
-      a=Math.random()*TAU;
-
-      b=Math.random()*TAU;
-
-      r=2.5;
-
-      x=
-        (7+r*Math.cos(b))*
-        Math.cos(a);
-
-      y=
-        r*Math.sin(b);
-
-      z=
-        (7+r*Math.cos(b))*
-        Math.sin(a);
-
-    }
-
-
-    /* HEART */
-
-    if(shapeIndex===3){
-
-      t=Math.random()*TAU;
-
-      const s=
-        .48+
-        Math.sqrt(
-          Math.random()
-        )*.52;
-
-      x=
-        16*
-        Math.sin(t)**3*
-        s*.55;
-
-      y=
-        (
-          13*Math.cos(t)
-          -5*Math.cos(2*t)
-          -2*Math.cos(3*t)
-          -Math.cos(4*t)
-        )*
-        s*.55;
-
-      z=
-        rand(-2.5,2.5)*
-        s;
-
-    }
-
-
-    /* FLOWER */
-
-    if(shapeIndex===4){
-
-      t=Math.random()*TAU;
-
-      r=
-        9*
-        Math.cos(5*t);
-
-      x=
-        r*Math.cos(t);
-
-      y=
-        r*Math.sin(t);
-
-      z=
-        rand(-1,1)*
-        (
-          2+
-          5*
-          Math.abs(
-            Math.sin(5*t)
-          )
-        );
-
-    }
-
-
-    /* DNA */
-
-    if(shapeIndex===5){
-
-      t=rand(0,TAU);
-
-      q=rand(-8,8);
-
-      x=
-        3*
-        Math.cos(
-          t*4+q*.35
-        );
-
-      y=q;
-
-      z=
-        3*
-        Math.sin(
-          t*4+q*.35
-        );
-
-    }
-
-
-    /* SATURN */
-
-    if(shapeIndex===6){
-
-      a=Math.random()*TAU;
-
-      r=
-        7+
-        1.8*
-        Math.cos(
-          Math.random()*TAU
-        );
-
-      x=
-        r*Math.cos(a);
-
-      z=
-        r*Math.sin(a);
-
-      y=
-        rand(-.65,.65);
-
-    }
-
-
-    /* CUBE */
-
-    if(shapeIndex===7){
-
-      x=rand(-7,7);
-
-      y=rand(-7,7);
-
-      z=rand(-7,7);
-
-      const m=
-        Math.max(
-          Math.abs(x),
-          Math.abs(y),
-          Math.abs(z)
-        ) || 1;
-
-      x*=8/m;
-
-      y*=8/m;
-
-      z*=8/m;
-
-    }
-
-
-    /* VORTEX */
-
-    if(shapeIndex===8){
-
-      a=Math.random()*TAU;
-
-      r=
-        Math.pow(
-          Math.random(),
-          .5
-        )*11;
-
-      t=rand(-2.4,2.4);
-
-      x=
-        r*
-        Math.cos(
-          a+t*.8
-        );
-
-      z=
-        r*
-        Math.sin(
-          a+t*.8
-        );
-
-      y=t*2.2;
-
-    }
-
-
-    /* NEBULA */
-
-    if(shapeIndex===9){
-
-      a=Math.random()*TAU;
-
-      r=
-        Math.pow(
-          Math.random(),
-          .45
-        )*16;
-
-      x=
-        Math.cos(a)*r;
-
-      z=
-        Math.sin(a)*r;
-
-      y=
-        Math.sin(
-          r*.7+a*3
-        )*4+
-        rand(-2,2);
-
-      const twist=
-        a+r*.35;
-
-      x+=
-        Math.cos(twist)*
-        r*.25;
-
-      z+=
-        Math.sin(twist)*
-        r*.25;
-
-    }
-
-
-    out[j]=x;
-
-    out[j+1]=y;
-
-    out[j+2]=z;
-
-  }
-
-
-  for(
-    let i=particleCount;
-    i<MAX_PARTICLES;
-    i++
-  ){
-
-    const j=i*3;
-
-    out[j]=0;
-
-    out[j+1]=0;
-
-    out[j+2]=0;
-
-  }
-
-}
-
-
-/* ============================================================
-   BEGIN SHAPE MORPH
-   ============================================================ */
-
-function beginMorph(nextShape){
-
-  morphFrom.set(target);
-
-  generateShape(
-    morphTo,
-    nextShape
-  );
-
-  shape=nextShape;
-
-  morphAmount=0;
-
-  morphActive=true;
-
-  shapeEl.textContent=
-    shapeNames[shape];
-
-  toast(
-    shapeNames[shape]
-  );
-
-}
-
-
-/* ============================================================
-   UPDATE MORPH
-   ============================================================ */
-
-function updateMorph(){
-
-  if(!morphActive)
-    return;
-
-  morphAmount=
-    Math.min(
-      1,
-      morphAmount+.035
-    );
-
-  const s=morphAmount;
-
-
-  for(
-    let i=0;
-    i<particleCount*3;
-    i++
-  ){
-
-    target[i]=
-      morphFrom[i]*(1-s)+
-      morphTo[i]*s;
-
-  }
-
-
-  if(s>=1)
-    morphActive=false;
-
-}
-
-
-/* ============================================================
+/* =========================================================
    CHANGE SHAPE
-   ============================================================ */
+========================================================= */
 
-function setShape(d){
+function setShape(direction){
 
-  beginMorph(
-    (
-      shape+d+
-      shapeNames.length
-    ) %
-    shapeNames.length
-  );
+    shape =
+        (shape+direction+shapeNames.length)
+        %shapeNames.length;
 
+    fillTarget();
+
+    toast(shapeNames[shape]);
 }
 
 
-/* ============================================================
-   RANDOMIZE
-   ============================================================ */
-
-function randomize(){
-
-  for(
-    let i=0;
-    i<particleCount;
-    i++
-  ){
-
-    const j=i*3;
-
-    target[j]+=
-      rand(-2,2);
-
-    target[j+1]+=
-      rand(-2,2);
-
-    target[j+2]+=
-      rand(-2,2);
-
-  }
-
-  toast("RANDOMIZED");
-
-}
-
-
-/* ============================================================
-   RESET
-   ============================================================ */
-
-function reset(){
-
-  scaleT=1;
-
-  scale=1;
-
-  universeX=0;
-
-  universeY=0;
-
-  universeZ=0;
-
-  rotationTargetX=0;
-
-  rotationTargetY=0;
-
-  rotationTargetZ=0;
-
-  points.position.set(
-    0,0,0
-  );
-
-  points.rotation.set(
-    0,0,0
-  );
-
-  freeze=false;
-
-  blackHole=false;
-
-  nebulaMode=false;
-
-  gravityEnabled=true;
-
-  forceFieldEnabled=false;
-
-
-  setButton(
-    "blackHole",
-    false
-  );
-
-  setButton(
-    "gravity",
-    true
-  );
-
-  setButton(
-    "force",
-    false
-  );
-
-
-  toast("RESET");
-
-}
-
-
-/* ============================================================
-   SUPERNOVA / BURST
-   ============================================================ */
+/* =========================================================
+   BURST
+========================================================= */
 
 function burst(){
 
-  burstEnergy=1;
+    burstEnergy = 1;
 
+    for(let i=0;i<N;i++){
 
-  for(
-    let i=0;
-    i<particleCount;
-    i++
-  ){
+        const j=i*3;
 
-    const j=i*3;
+        const len =
+            Math.sqrt(
+                positionArray[j]**2+
+                positionArray[j+1]**2+
+                positionArray[j+2]**2
+            ) || 1;
 
-    const x=pos[j];
+        velocityArray[j] +=
+            positionArray[j]/len*.08;
 
-    const y=pos[j+1];
+        velocityArray[j+1] +=
+            positionArray[j+1]/len*.08;
 
-    const z=pos[j+2];
+        velocityArray[j+2] +=
+            positionArray[j+2]/len*.08;
+    }
 
-    const d=
-      Math.sqrt(
-        x*x+y*y+z*z
-      )+.001;
-
-
-    vel[j]+=
-      (x/d)*.25+
-      rand(-.03,.03);
-
-    vel[j+1]+=
-      (y/d)*.25+
-      rand(-.03,.03);
-
-    vel[j+2]+=
-      (z/d)*.25+
-      rand(-.03,.03);
-
-  }
-
-
-  toast("SUPERNOVA");
-
+    toast("ENERGY BURST");
 }
 
 
-/* ============================================================
-   GRAVITY
-   ============================================================ */
+/* =========================================================
+   RESET
+========================================================= */
 
-function applyGravity(j,a){
+function reset(){
 
-  if(
-    !gravityEnabled &&
-    !blackHole
-  )
-    return;
+    scaleTarget = 1;
+    scale = 1;
 
+    targetUniverseX = 0;
+    targetUniverseY = 0;
 
-  const dx=
-    gravityWell.x-a[j];
+    universeX = 0;
+    universeY = 0;
 
-  const dy=
-    gravityWell.y-a[j+1];
+    mouseX = 0;
+    mouseY = 0;
 
-  const dz=
-    gravityWell.z-a[j+2];
+    fillTarget();
 
-
-  const d2=
-    dx*dx+
-    dy*dy+
-    dz*dz+
-    .7;
-
-
-  const force=
-    (
-      blackHole
-        ? .045
-        : .018
-    )/
-    d2;
-
-
-  vel[j]+=dx*force;
-
-  vel[j+1]+=dy*force;
-
-  vel[j+2]+=dz*force;
-
-
-  if(blackHole){
-
-    const swirl=
-      .018/
-      Math.sqrt(d2);
-
-
-    vel[j]+=
-      -dy*swirl;
-
-    vel[j+1]+=
-      dx*swirl;
-
-  }
-
+    toast("RESET");
 }
 
 
-/* ============================================================
-   FINGERTIP GRAVITY
-   ============================================================ */
-
-function applyFingertip(j,a){
-
-  if(
-    !fingertip.active ||
-    controlMode!==3
-  )
-    return;
-
-
-  const dx=
-    fingertip.x-a[j];
-
-  const dy=
-    fingertip.y-a[j+1];
-
-  const dz=
-    fingertip.z-a[j+2];
-
-
-  const d2=
-    dx*dx+
-    dy*dy+
-    dz*dz+
-    1;
-
-
-  const f=
-    .045/d2;
-
-
-  vel[j]+=dx*f;
-
-  vel[j+1]+=dy*f;
-
-  vel[j+2]+=dz*f;
-
-}
-
-
-/* ============================================================
-   FORCE FIELD
-   ============================================================ */
-
-function applyForceField(j,a){
-
-  if(!forceFieldEnabled)
-    return;
-
-
-  const x=a[j];
-
-  const y=a[j+1];
-
-  const z=a[j+2];
-
-
-  const d=
-    Math.sqrt(
-      x*x+
-      y*y+
-      z*z
-    )+1;
-
-
-  const f=
-    forceField.strength/d;
-
-
-  vel[j]+=
-    -y*f;
-
-  vel[j+1]+=
-    x*f;
-
-  vel[j+2]+=
-    Math.sin(d)*f*.35;
-
-}
-
-
-/* ============================================================
-   LIGHTWEIGHT COLLISION / REPULSION
-   ============================================================ */
-
-function applyCollisionApprox(j,a){
-
-  if(!collisionsEnabled)
-    return;
-
-
-  const x=a[j];
-
-  const y=a[j+1];
-
-  const z=a[j+2];
-
-
-  const d=
-    Math.sqrt(
-      x*x+
-      y*y+
-      z*z
-    )+.001;
-
-
-  if(d<2.2){
-
-    const f=
-      (2.2-d)*
-      collisionStrength;
-
-
-    vel[j]+=
-      x/d*f;
-
-    vel[j+1]+=
-      y/d*f;
-
-    vel[j+2]+=
-      z/d*f;
-
-  }
-
-}
-
-
-/* ============================================================
-   ENVIRONMENT
-   ============================================================ */
-
-function setEnvironment(){
-
-  const e=
-    environments[
-      environmentIndex
-    ];
-
-
-  scene.background=
-    new THREE.Color(e.bg);
-
-
-  scene.fog=
-    new THREE.FogExp2(
-      e.fog,
-      .018
-    );
-
-
-  toast(
-    "ENVIRONMENT "+
-    (environmentIndex+1)
-  );
-
-}
-
-
-/* ============================================================
-   CINEMATIC CAMERA
-   ============================================================ */
-
-function cinematicCamera(t){
-
-  if(!cinematic)
-    return;
-
-
-  camera.position.x=
-    Math.sin(t*.15)*
-    35;
-
-
-  camera.position.y=
-    Math.cos(t*.11)*
-    10;
-
-
-  camera.position.z=
-    30+
-    Math.sin(t*.2)*
-    5;
-
-
-  camera.lookAt(
-    points.position
-  );
-
-}
-
-
-/* ============================================================
-   AUDIO
-   ============================================================ */
-
-async function startAudio(){
-
-  if(audioContext){
-
-    audioContext.resume();
-
-    return;
-
-  }
-
-
-  try{
-
-    const stream=
-      await navigator.mediaDevices
-        .getUserMedia({
-          audio:true
-        });
-
-
-    audioContext=
-      new AudioContext();
-
-
-    const source=
-      audioContext
-        .createMediaStreamSource(
-          stream
-        );
-
-
-    analyser=
-      audioContext
-        .createAnalyser();
-
-
-    analyser.fftSize=256;
-
-
-    source.connect(
-      analyser
-    );
-
-
-    audioData=
-      new Uint8Array(
-        analyser.frequencyBinCount
-      );
-
-
-    toast(
-      "AUDIO ONLINE"
-    );
-
-
-    updateEffects();
-
-  }
-
-  catch(e){
-
-    alert(
-      "Microphone could not start."+
-      "\n\n"+
-      e.name+
-      " — "+
-      e.message
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   UPDATE AUDIO
-   ============================================================ */
-
-function updateAudio(){
-
-  if(!analyser)
-    return;
-
-
-  analyser.getByteFrequencyData(
-    audioData
-  );
-
-
-  let total=0;
-
-
-  for(
-    let i=0;
-    i<audioData.length;
-    i++
-  ){
-
-    total+=
-      audioData[i];
-
-  }
-
-
-  audioLevel=
-    total/
-    audioData.length/
-    255;
-
-}
-
-
-/* ============================================================
-   THREE.JS INITIALIZATION
-   ============================================================ */
+/* =========================================================
+   INITIALIZE THREE.JS
+========================================================= */
 
 function init(){
 
-  scene=
-    new THREE.Scene();
-
-
-  scene.background=
-    new THREE.Color(
-      0x000000
-    );
-
-
-  scene.fog=
-    new THREE.FogExp2(
-      0x000006,
-      .018
-    );
-
-
-  camera=
-    new THREE.PerspectiveCamera(
-      60,
-      innerWidth/innerHeight,
-      .1,
-      1000
-    );
-
-
-  camera.position.z=30;
-
-
-  renderer=
-    new THREE.WebGLRenderer({
-
-      antialias:true,
-
-      powerPreference:
-        "high-performance"
-
-    });
-
-
-  renderer.setPixelRatio(
-    Math.min(
-      devicePixelRatio,
-      2
-    )
-  );
-
-
-  renderer.setSize(
-    innerWidth,
-    innerHeight
-  );
-
-
-  document.body.appendChild(
-    renderer.domElement
-  );
-
-
-  /* PARTICLE GEOMETRY */
-
-  geometry=
-    new THREE.BufferGeometry();
-
-
-  pos=
-    new Float32Array(
-      MAX_PARTICLES*3
-    );
-
-
-  target=
-    new Float32Array(
-      MAX_PARTICLES*3
-    );
-
-
-  vel=
-    new Float32Array(
-      MAX_PARTICLES*3
-    );
-
-
-  phase=
-    new Float32Array(
-      MAX_PARTICLES
-    );
-
-
-  previousPositions=
-    new Float32Array(
-      MAX_PARTICLES*3
-    );
-
-
-  trailPositions1=
-    new Float32Array(
-      MAX_PARTICLES*3
-    );
-
-
-  trailPositions2=
-    new Float32Array(
-      MAX_PARTICLES*3
-    );
-
-
-  /* INITIAL PARTICLE STATE */
-
-  for(
-    let i=0;
-    i<MAX_PARTICLES;
-    i++
-  ){
-
-    const j=i*3;
-
-
-    pos[j]=
-      rand(-.5,.5);
-
-    pos[j+1]=
-      rand(-.5,.5);
-
-    pos[j+2]=
-      rand(-.5,.5);
-
-
-    previousPositions[j]=
-      pos[j];
-
-    previousPositions[j+1]=
-      pos[j+1];
-
-    previousPositions[j+2]=
-      pos[j+2];
-
-
-    phase[i]=
-      Math.random()*TAU;
-
-  }
-
-
-  geometry.setAttribute(
-
-    "position",
-
-    new THREE.BufferAttribute(
-      pos,
-      3
-    )
-
-  );
-
-
-  geometry.setDrawRange(
-    0,
-    particleCount
-  );
-
-
-  /* PARTICLE MATERIAL */
-
-  material=
-    new THREE.PointsMaterial({
-
-      size:.07,
-
-      sizeAttenuation:true,
-
-      transparent:true,
-
-      opacity:.88,
-
-      blending:
-        THREE.AdditiveBlending,
-
-      depthWrite:false
-
-    });
-
-
-  material.userData={
-
-    c1:new THREE.Color(),
-
-    c2:new THREE.Color(),
-
-    c3:new THREE.Color()
-
-  };
-
-
-  points=
-    new THREE.Points(
-      geometry,
-      material
-    );
-
-
-  scene.add(
-    points
-  );
-
-
-  /* TRAIL GEOMETRIES */
-
-  trailGeometry1=
-    new THREE.BufferGeometry();
-
-  trailGeometry2=
-    new THREE.BufferGeometry();
-
-
-  trailGeometry1.setAttribute(
-
-    "position",
-
-    new THREE.BufferAttribute(
-      trailPositions1,
-      3
-    )
-
-  );
-
-
-  trailGeometry2.setAttribute(
-
-    "position",
-
-    new THREE.BufferAttribute(
-      trailPositions2,
-      3
-    )
-
-  );
-
-
-  trailGeometry1.setDrawRange(
-    0,
-    particleCount
-  );
-
-
-  trailGeometry2.setDrawRange(
-    0,
-    particleCount
-  );
-
-
-  /* TRAIL MATERIALS */
-
-  const trailMat1=
-    new THREE.PointsMaterial({
-
-      size:.045,
-
-      transparent:true,
-
-      opacity:.22,
-
-      blending:
-        THREE.AdditiveBlending,
-
-      depthWrite:false
-
-    });
-
-
-  const trailMat2=
-    new THREE.PointsMaterial({
-
-      size:.03,
-
-      transparent:true,
-
-      opacity:.10,
-
-      blending:
-        THREE.AdditiveBlending,
-
-      depthWrite:false
-
-    });
-
-
-  trailPoints1=
-    new THREE.Points(
-      trailGeometry1,
-      trailMat1
-    );
-
-
-  trailPoints2=
-    new THREE.Points(
-      trailGeometry2,
-      trailMat2
-    );
-
-
-  scene.add(
-    trailPoints1,
-    trailPoints2
-  );
-
-
-  /* INITIAL SHAPE */
-
-  generateShape(
-    target,
-    shape
-  );
-
-
-  morphFrom.set(
-    target
-  );
-
-
-  morphTo.set(
-    target
-  );
-
-
-  setPalette();
-
-
-  /* STARS */
-
-  addStars();
-
-
-  /* RESIZE */
-
-  window.addEventListener(
-    "resize",
-    ()=>{
-
-      camera.aspect=
-        innerWidth/
-        innerHeight;
-
-      camera.updateProjectionMatrix();
-
-      renderer.setSize(
-        innerWidth,
-        innerHeight
-      );
-
-    }
-  );
-
-
-  /* MOUSE */
-
-  addEventListener(
-    "pointermove",
-    e=>{
-
-      mouseX=
-        (
-          e.clientX/
-          innerWidth-
-          .5
-        )*2;
-
-
-      mouseY=
-        (
-          e.clientY/
-          innerHeight-
-          .5
-        )*2;
-
-    }
-  );
-
-}
-
-
-/* ============================================================
-   STAR FIELD
-   ============================================================ */
-
-function addStars(){
-
-  const g=
-    new THREE.BufferGeometry();
-
-
-  const p=
-    new Float32Array(
-      1800*3
-    );
-
-
-  for(
-    let i=0;
-    i<1800;
-    i++
-  ){
-
-    const r=
-      rand(45,120);
-
-    const a=
-      Math.random()*TAU;
-
-    const u=
-      rand(-1,1);
-
-    const s=
-      Math.sqrt(
-        1-u*u
-      );
-
-
-    p[i*3]=
-      r*s*Math.cos(a);
-
-    p[i*3+1]=
-      r*u;
-
-    p[i*3+2]=
-      r*s*Math.sin(a);
-
-  }
-
-
-  g.setAttribute(
-
-    "position",
-
-    new THREE.BufferAttribute(
-      p,
-      3
-    )
-
-  );
-
-
-  starField=
-    new THREE.Points(
-
-      g,
-
-      new THREE.PointsMaterial({
-
-        size:.035,
-
-        color:0x9fb7ff,
-
-        transparent:true,
-
-        opacity:.45
-
-      })
-
-    );
-
-
-  scene.add(
-    starField
-  );
-
-}
-
-
-/* ============================================================
-   DISTANCE HELPER
-   ============================================================ */
-
-function distance2D(a,b){
-
-  return Math.hypot(
-    a.x-b.x,
-    a.y-b.y
-  );
-
-}
-
-
-/* ============================================================
-   OPEN PALM DETECTION
-   ============================================================ */
-
-function palmOpen(lm){
-
-  const wrist=
-    lm[0];
-
-
-  const tips=[
-    8,
-    12,
-    16,
-    20
-  ];
-
-
-  const pips=[
-    6,
-    10,
-    14,
-    18
-  ];
-
-
-  let n=0;
-
-
-  for(
-    let k=0;
-    k<4;
-    k++
-  ){
-
-    const tip=
-      Math.hypot(
-        lm[tips[k]].x-
-        wrist.x,
-
-        lm[tips[k]].y-
-        wrist.y
-      );
-
-
-    const pip=
-      Math.hypot(
-        lm[pips[k]].x-
-        wrist.x,
-
-        lm[pips[k]].y-
-        wrist.y
-      );
-
-
-    if(
-      tip>
-      pip*1.08
-    )
-      n++;
-
-  }
-
-
-  return n>=3;
-
-}
-
-
-/* ============================================================
-   FIST DETECTION
-   ============================================================ */
-
-function isFist(lm){
-
-  const wrist=
-    lm[0];
-
-
-  const tips=[
-    8,
-    12,
-    16,
-    20
-  ];
-
-
-  const pips=[
-    6,
-    10,
-    14,
-    18
-  ];
-
-
-  let folded=0;
-
-
-  for(
-    let i=0;
-    i<4;
-    i++
-  ){
-
-    if(
-
-      distance2D(
-        lm[tips[i]],
-        wrist
-      )
-
-      <
-
-      distance2D(
-        lm[pips[i]],
-        wrist
-      )*1.08
-
-    )
-      folded++;
-
-  }
-
-
-  return folded>=3;
-
-}
-
-
-/* ============================================================
-   POINTING DETECTION
-   ============================================================ */
-
-function isPointing(lm){
-
-  const indexExtended=
-
-    distance2D(
-      lm[8],
-      lm[0]
-    )
-
-    >
-
-    distance2D(
-      lm[6],
-      lm[0]
-    )*1.12;
-
-
-  const middleFolded=
-
-    distance2D(
-      lm[12],
-      lm[0]
-    )
-
-    <
-
-    distance2D(
-      lm[10],
-      lm[0]
-    )*1.08;
-
-
-  const ringFolded=
-
-    distance2D(
-      lm[16],
-      lm[0]
-    )
-
-    <
-
-    distance2D(
-      lm[14],
-      lm[0]
-    )*1.08;
-
-
-  const pinkyFolded=
-
-    distance2D(
-      lm[20],
-      lm[0]
-    )
-
-    <
-
-    distance2D(
-      lm[18],
-      lm[0]
-    )*1.08;
-
-
-  return(
-
-    indexExtended &&
-    middleFolded &&
-    ringFolded &&
-    pinkyFolded
-
-  );
-
-}
-
-
-/* ============================================================
-   FINGER COUNT
-   ============================================================ */
-
-function fingerCount(lm){
-
-  const wrist=
-    lm[0];
-
-
-  const tips=[
-    8,
-    12,
-    16,
-    20
-  ];
-
-
-  const pips=[
-    6,
-    10,
-    14,
-    18
-  ];
-
-
-  let n=0;
-
-
-  for(
-    let i=0;
-    i<4;
-    i++
-  ){
-
-    if(
-
-      distance2D(
-        lm[tips[i]],
-        wrist
-      )
-
-      >
-
-      distance2D(
-        lm[pips[i]],
-        wrist
-      )*1.08
-
-    )
-      n++;
-
-  }
-
-
-  return n;
-
-}
-
-
-/* ============================================================
-   SWIPE DETECTION
-   ============================================================ */
-
-function detectSwipe(
-  x,
-  y,
-  now
-){
-
-  if(
-    lastPalmX===null
-  ){
-
-    lastPalmX=x;
-
-    lastPalmY=y;
-
-    lastPalmTime=now;
-
-    return null;
-
-  }
-
-
-  const dt=
-    Math.max(
-      16,
-      now-lastPalmTime
-    );
-
-
-  const dx=
-    x-lastPalmX;
-
-
-  const dy=
-    y-lastPalmY;
-
-
-  const speed=
-    Math.hypot(
-      dx,
-      dy
-    )/dt;
-
-
-  lastPalmX=x;
-
-  lastPalmY=y;
-
-  lastPalmTime=now;
-
-
-  if(
-    swipeLock>0
-  )
-    return null;
-
-
-  if(
-
-    Math.hypot(
-      dx,
-      dy
-    )>.055
-
-    &&
-
-    speed>.00035
-
-  ){
-
-    swipeLock=700;
-
-
-    if(
-      Math.abs(dx)>
-      Math.abs(dy)*1.25
-    ){
-
-      return dx<0
-        ? "SWIPE_LEFT"
-        : "SWIPE_RIGHT";
-
-    }
-
-
-    return dy<0
-      ? "SWIPE_UP"
-      : "SWIPE_DOWN";
-
-  }
-
-
-  return null;
-
-}
-
-
-/* ============================================================
-   MAIN HAND PROCESSING
-   ============================================================ */
-
-function processHand(
-  lm,
-  index
-){
-
-  hand=true;
-
-  handCount=
-    Math.max(
-      handCount,
-      index+1
-    );
-
-
-  const wrist=
-    lm[0];
-
-
-  const thumb=
-    lm[4];
-
-
-  const indexTip=
-    lm[8];
-
-
-  const pinch=
-    distance2D(
-      thumb,
-      indexTip
-    );
-
-
-  /* NORMALIZED HAND POSITION */
-
-  handX=
-    clamp(
-      (wrist.x-.5)*2,
-      -1,
-      1
-    );
-
-
-  handY=
-    clamp(
-      (wrist.y-.5)*2,
-      -1,
-      1
-    );
-
-
-  handZ=
-    clamp(
-      -wrist.z*4,
-      -1,
-      1
-    );
-
-
-  const now=
-    performance.now();
-
-
-  /* HAND VELOCITY */
-
-  if(
-    lastPalmTime>0
-  ){
-
-    const dt=
-      Math.max(
-        .016,
-        (now-lastPalmTime)/1000
-      );
-
-
-    handVX=
-      (
-        handX-
-        (lastPalmX??handX)
-      )/dt;
-
-
-    handVY=
-      (
-        handY-
-        (lastPalmY??handY)
-      )/dt;
-
-
-    handVZ=
-      (
-        handZ-
-        (lastPalmZ??handZ)
-      )/dt;
-
-  }
-
-
-  const openNow=
-    palmOpen(lm);
-
-
-  const fist=
-    isFist(lm);
-
-
-  const pointing=
-    isPointing(lm);
-
-
-  const fingers=
-    fingerCount(lm);
-
-
-  /* COLOR */
-
-  if(
-    openNow &&
-    !lastOpen
-  ){
-
-    cycleColor();
-
-  }
-
-
-  lastOpen=
-    openNow;
-
-
-  /* SWIPE */
-
-  const swipe=
-    detectSwipe(
-      wrist.x,
-      wrist.y,
-      now
-    );
-
-
-  if(swipe){
-
-    gestureState=
-      swipe;
-
-
-    if(
-      swipe===
-      "SWIPE_LEFT"
-    ){
-
-      setShape(-1);
-
-    }
-
-
-    if(
-      swipe===
-      "SWIPE_RIGHT"
-    ){
-
-      setShape(1);
-
-    }
-
-
-    if(
-      swipe===
-      "SWIPE_UP"
-    ){
-
-      rotationTargetX-=
-        Math.PI*.5;
-
-      toast(
-        "FLIP UP"
-      );
-
-    }
-
-
-    if(
-      swipe===
-      "SWIPE_DOWN"
-    ){
-
-      rotationTargetX+=
-        Math.PI*.5;
-
-      toast(
-        "FLIP DOWN"
-      );
-
-    }
-
-  }
-
-  else if(fist){
-
-    gestureState=
-      "FIST";
-
-    freeze=true;
-
-  }
-
-  else{
-
-    freeze=false;
-
-
-    if(
-      pinch<.055
-    )
-      gestureState=
-        "PINCH";
-
-
-    else if(pointing)
-      gestureState=
-        "POINT";
-
-
-    else if(fingers===2)
-      gestureState=
-        "TWO FINGERS";
-
-
-    else if(openNow)
-      gestureState=
-        "OPEN PALM";
-
-
-    else
-      gestureState=
-        "TRACKING";
-
-  }
-
-
-  /* ============================================================
-     MOVE MODE
-     ============================================================ */
-
-  if(
-    controlMode===0
-  ){
-
-    rotationTargetY=
-      handX*.75;
-
-
-    rotationTargetX=
-      -handY*.55;
-
-
-    universeX=
-      handX*9;
-
-
-    universeY=
-      -handY*6;
-
-
-    universeZ=
-      handZ*8;
-
-  }
-
-
-  /* ============================================================
-     ROTATE MODE
-     ============================================================ */
-
-  if(
-    controlMode===1
-  ){
-
-    rotationTargetY=
-      handX*1.8;
-
-
-    rotationTargetX=
-      -handY*1.3;
-
-
-    rotationTargetZ=
-      wristAngle;
-
-  }
-
-
-  /* ============================================================
-     FORCE MODE
-     ============================================================ */
-
-  if(
-    controlMode===2
-  ){
-
-    gravityWell.active=true;
-
-
-    gravityWell.x=
-      handX*10;
-
-
-    gravityWell.y=
-      -handY*7;
-
-
-    gravityWell.z=
-      handZ*8;
-
-
-    gravityWell.strength=
-      .035;
-
-  }
-
-
-  /* ============================================================
-     FINGERTIP
-     ============================================================ */
-
-  fingertip.active=
-    pointing;
-
-
-  fingertip.x=
-    (indexTip.x-.5)*20;
-
-
-  fingertip.y=
-    -(indexTip.y-.5)*14;
-
-
-  fingertip.z=
-    -indexTip.z*10;
-
-
-  /* ============================================================
-     PINCH SCALE
-     ============================================================ */
-
-  scaleT=
-    THREE.MathUtils.clamp(
-
-      .55+
-      pinch/.20*2.35,
-
-      .55,
-      3.25
-
-    );
-
-
-  /* ============================================================
-     GRAB MODE
-     ============================================================ */
-
-  if(
-    controlMode===3 &&
-    pointing
-  ){
-
-    universeX=
-      handX*7;
-
-
-    universeY=
-      -handY*5;
-
-  }
-
-
-  gestureEl.textContent=
-    gestureState;
-
-
-  modeEl.textContent=
-    controlModes[
-      controlMode
-    ];
-
-}
-
-
-/* ============================================================
-   TWO-HAND CONTROL
-   ============================================================ */
-
-function processTwoHands(
-  hands
-){
-
-  if(
-    hands.length<2
-  )
-    return;
-
-
-  const a=
-    hands[0][0];
-
-
-  const b=
-    hands[1][0];
-
-
-  const dx=
-    a.x-b.x;
-
-
-  const dy=
-    a.y-b.y;
-
-
-  const distance=
-    Math.hypot(
-      dx,
-      dy
-    );
-
-
-  /*
-
-     HANDS FAR APART
-     =
-     EXPAND
-
-     HANDS CLOSE
-     =
-     COMPRESS
-
-  */
-
-  scaleT=
-    clamp(
-      .45+
-      distance*3.0,
-      .45,
-      4.0
-    );
-
-
-  rotationTargetZ=
-    clamp(
-      (a.y-b.y)*2.0,
-      -1.5,
-      1.5
-    );
-
-
-  gestureEl.textContent=
-    "TWO HANDS";
-
-}
-
-
-/* ============================================================
-   NO HAND
-   ============================================================ */
-
-function noHand(){
-
-  hand=false;
-
-  handCount=0;
-
-  gestureState=
-    "NONE";
-
-
-  gestureEl.textContent=
-    "NO HAND";
-
-
-  lastPalmX=null;
-
-  lastPalmY=null;
-
-  lastPalmZ=null;
-
-
-  fingertip.active=false;
-
-
-  gravityWell.active=false;
-
-
-  scaleT+=
-    (1-scaleT)*.02;
-
-}
-
-
-/* ============================================================
-   UNIVERSE POSITION
-   ============================================================ */
-
-function updateUniversePosition(){
-
-  points.position.x+=
-    (
-      universeX-
-      points.position.x
-    )*.08;
-
-
-  points.position.y+=
-    (
-      universeY-
-      points.position.y
-    )*.08;
-
-
-  points.position.z+=
-    (
-      universeZ-
-      points.position.z
-    )*.08;
-
-
-  trailPoints1.position.copy(
-    points.position
-  );
-
-
-  trailPoints2.position.copy(
-    points.position
-  );
-
-}
-
-
-/* ============================================================
-   UNIVERSE ROTATION
-   ============================================================ */
-
-function updateUniverseRotation(){
-
-  points.rotation.x+=
-    (
-      rotationTargetX-
-      points.rotation.x
-    )*.05;
-
-
-  points.rotation.y+=
-    (
-      rotationTargetY-
-      points.rotation.y
-    )*.05;
-
-
-  points.rotation.z+=
-    (
-      rotationTargetZ-
-      points.rotation.z
-    )*.05;
-
-
-  trailPoints1.rotation.copy(
-    points.rotation
-  );
-
-
-  trailPoints2.rotation.copy(
-    points.rotation
-  );
-
-}
-
-
-/* ============================================================
-   TRAILS
-   ============================================================ */
-
-function updateTrails(){
-
-  if(!trailsEnabled){
-
-    trailPoints1.visible=false;
-
-    trailPoints2.visible=false;
-
-    return;
-
-  }
-
-
-  trailPoints1.visible=true;
-
-  trailPoints2.visible=true;
-
-
-  trailPositions2.set(
-    trailPositions1
-  );
-
-
-  trailPositions1.set(
-    previousPositions
-  );
-
-
-  previousPositions.set(
-    pos
-  );
-
-
-  trailGeometry1
-    .attributes
-    .position
-    .needsUpdate=true;
-
-
-  trailGeometry2
-    .attributes
-    .position
-    .needsUpdate=true;
-
-}
-
-
-/* ============================================================
-   MAIN ANIMATION LOOP
-   ============================================================ */
-
-function animate(){
-
-  requestAnimationFrame(
-    animate
-  );
-
-
-  const dt=
-    Math.min(
-      clock.getDelta(),
-      .033
-    );
-
-
-  const t=
-    clock.elapsedTime;
-
-
-  swipeLock=
-    Math.max(
-      0,
-      swipeLock-
-      dt*1000
-    );
-
-
-  burstEnergy*=
-    .94;
-
-
-  updateMorph();
-
-  updateAudio();
-
-
-  if(!freeze){
-
-    scale+=
-      (
-        scaleT-
-        scale
-      )*.08;
-
-
-    const a=
-      geometry
-        .attributes
-        .position
-        .array;
-
-
-    const c1=
-      material.userData.c1;
-
-
-    const c2=
-      material.userData.c2;
-
-
-    for(
-      let i=0;
-      i<particleCount;
-      i++
-    ){
-
-      const j=i*3;
-
-
-      const wob=
-        Math.sin(
-          t*1.7+
-          phase[i]
-        )*.018;
-
-
-      const tx=
-        target[j]*
-        scale;
-
-
-      const ty=
-        target[j+1]*
-        scale;
-
-
-      const tz=
-        target[j+2]*
-        scale;
-
-
-      const dx=
-        tx-a[j];
-
-
-      const dy=
-        ty-a[j+1];
-
-
-      const dz=
-        tz-a[j+2];
-
-
-      /* SHAPE SPRING */
-
-      vel[j]+=
-        dx*.0035;
-
-
-      vel[j+1]+=
-        dy*.0035;
-
-
-      vel[j+2]+=
-        dz*.0035;
-
-
-      /* GRAVITY */
-
-      applyGravity(
-        j,
-        a
-      );
-
-
-      /* FINGERTIP */
-
-      applyFingertip(
-        j,
-        a
-      );
-
-
-      /* FORCE FIELD */
-
-      applyForceField(
-        j,
-        a
-      );
-
-
-      /* COLLISION APPROXIMATION */
-
-      applyCollisionApprox(
-        j,
-        a
-      );
-
-
-      /* DAMPING */
-
-      vel[j]*=.92;
-
-      vel[j+1]*=.92;
-
-      vel[j+2]*=.92;
-
-
-      /* POSITION */
-
-      a[j]+=
-        vel[j]+
-        wob*.5;
-
-
-      a[j+1]+=
-        vel[j+1]+
-        wob;
-
-
-      a[j+2]+=
-        vel[j+2]-
-        wob*.3;
-
-
-      /* SUPERNOVA */
-
-      if(
-        burstEnergy>.01
-      ){
-
-        a[j]+=
-          vel[j]*
-          burstEnergy*
-          2;
-
-
-        a[j+1]+=
-          vel[j+1]*
-          burstEnergy*
-          2;
-
-
-        a[j+2]+=
-          vel[j+2]*
-          burstEnergy*
-          2;
-
-      }
-
-    }
-
-
-    geometry
-      .attributes
-      .position
-      .needsUpdate=true;
-
-  }
-
-
-  /* POSITION */
-
-  updateUniversePosition();
-
-
-  /* ROTATION */
-
-  updateUniverseRotation();
-
-
-  /* AUTOMATIC ROTATION */
-
-  if(auto){
-
-    rotationTargetZ+=
-      Math.sin(
-        t*.18
-      )*.0008;
-
-  }
-
-
-  /* STARS */
-
-  if(starField)
-    starField.rotation.y+=
-      .00015;
-
-
-  /* COLOR ANIMATION */
-
-  material.color.lerpColors(
-
-    c1,
-    c2,
-    Math.sin(
-      t*.55
-    )*.5+.5
-
-  );
-
-
-  /* AUDIO RESPONSE */
-
-  if(analyser){
-
-    material.size=
-      .065+
-      audioLevel*.18;
-
-
-    points.scale.setScalar(
-      1+
-      audioLevel*.12
-    );
-
-  }
-
-  else{
-
-    material.size=.07;
-
-    points.scale.setScalar(
-      1
-    );
-
-  }
-
-
-  /* TRAILS */
-
-  if(
-    frameCounter++%3===0
-  )
-    updateTrails();
-
-
-  /* CINEMATIC CAMERA */
-
-  cinematicCamera(t);
-
-
-  /* FPS */
-
-  fpsEl.textContent=
-    Math.round(
-      1/dt
-    );
-
-
-  countEl.textContent=
-    particleCount.toLocaleString();
-
-
-  /* RENDER */
-
-  renderer.render(
-    scene,
-    camera
-  );
-
-}
-
-
-/* ============================================================
-   START CAMERA
-   ============================================================ */
-
-async function startCamera(){
-
-  $("startBtn").disabled=true;
-
-  $("startBtn").textContent=
-    "INITIALIZING...";
-
-
-  try{
-
-    if(
-      !navigator
-        .mediaDevices
-        ?.getUserMedia
-    ){
-
-      throw new Error(
-        "Camera API unavailable"
-      );
-
-    }
-
-
-    cameraStream=
-      await navigator
-        .mediaDevices
-        .getUserMedia({
-
-          video:{
-
-            width:{
-              ideal:1280
-            },
-
-            height:{
-              ideal:720
-            },
-
-            facingMode:"user"
-
-          },
-
-          audio:false
-
-        });
-
-
-    const video=
-      $("video");
-
-
-    video.srcObject=
-      cameraStream;
-
-
-    await video.play();
-
-
-    /* MEDIAPIPE HANDS */
-
-    const hands=
-      new Hands({
-
-        locateFile:
-          f =>
-            `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
-
-      });
-
-
-    hands.setOptions({
-
-      maxNumHands:2,
-
-      modelComplexity:1,
-
-      minDetectionConfidence:.65,
-
-      minTrackingConfidence:.62
-
-    });
-
-
-    hands.onResults(
-      r=>{
-
-        const detected=
-          r.multiHandLandmarks ||
-          [];
-
-
-        if(
-          detected.length===0
-        ){
-
-          noHand();
-
-          return;
-
-        }
-
-
-        handCount=
-          detected.length;
-
-
-        processHand(
-          detected[0],
-          0
+    scene = new THREE.Scene();
+
+    scene.fog =
+        new THREE.FogExp2(
+            0x000006,
+            .012
         );
 
 
-        if(
-          detected.length>=2
-        ){
+    camera =
+        new THREE.PerspectiveCamera(
+            60,
+            innerWidth/innerHeight,
+            .1,
+            1000
+        );
 
-          processTwoHands(
-            detected
-          );
+    camera.position.set(
+        0,
+        0,
+        34
+    );
 
+
+    renderer =
+        new THREE.WebGLRenderer({
+            antialias:true,
+            alpha:false,
+            powerPreference:"high-performance"
+        });
+
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio,2)
+    );
+
+    renderer.setSize(
+        innerWidth,
+        innerHeight
+    );
+
+    renderer.setClearColor(
+        0x000000,
+        1
+    );
+
+    document.body.appendChild(
+        renderer.domElement
+    );
+
+
+    /* =====================================================
+       PARTICLE ARRAYS
+    ===================================================== */
+
+    geometry =
+        new THREE.BufferGeometry();
+
+    positionArray =
+        new Float32Array(N*3);
+
+    targetArray =
+        new Float32Array(N*3);
+
+    velocityArray =
+        new Float32Array(N*3);
+
+    phaseArray =
+        new Float32Array(N);
+
+    colorArray =
+        new Float32Array(N*3);
+
+
+    /* =====================================================
+       INITIAL PARTICLE POSITIONS
+    ===================================================== */
+
+    for(let i=0;i<N;i++){
+
+        const j=i*3;
+
+        positionArray[j] =
+            rand(-10,10);
+
+        positionArray[j+1] =
+            rand(-10,10);
+
+        positionArray[j+2] =
+            rand(-10,10);
+
+        velocityArray[j]=0;
+        velocityArray[j+1]=0;
+        velocityArray[j+2]=0;
+
+        phaseArray[i] =
+            Math.random()*TAU;
+    }
+
+
+    geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(
+            positionArray,
+            3
+        )
+    );
+
+
+    geometry.setAttribute(
+        "color",
+        new THREE.BufferAttribute(
+            colorArray,
+            3
+        )
+    );
+
+
+    /* =====================================================
+       PARTICLE MATERIAL
+    ===================================================== */
+
+    material =
+        new THREE.PointsMaterial({
+
+            size:.115,
+
+            sizeAttenuation:true,
+
+            vertexColors:true,
+
+            transparent:true,
+
+            opacity:.95,
+
+            blending:
+                THREE.AdditiveBlending,
+
+            depthWrite:false
+        });
+
+
+    points =
+        new THREE.Points(
+            geometry,
+            material
+        );
+
+
+    points.frustumCulled = false;
+
+    scene.add(points);
+
+
+    /* =====================================================
+       INITIALIZE PARTICLES
+    ===================================================== */
+
+    fillTarget();
+
+    setPalette();
+
+
+    /* =====================================================
+       ADD CENTRAL ENERGY CORE
+    ===================================================== */
+
+    const coreGeometry =
+        new THREE.SphereGeometry(
+            1.2,
+            32,
+            32
+        );
+
+    const coreMaterial =
+        new THREE.MeshBasicMaterial({
+            color:0x00d9ff,
+            transparent:true,
+            opacity:.07
+        });
+
+    const core =
+        new THREE.Mesh(
+            coreGeometry,
+            coreMaterial
+        );
+
+    core.name="energyCore";
+
+    scene.add(core);
+
+
+    /* =====================================================
+       STARS
+    ===================================================== */
+
+    addStars();
+
+
+    /* =====================================================
+       RESIZE
+    ===================================================== */
+
+    window.addEventListener(
+        "resize",
+        ()=>{
+
+            camera.aspect =
+                innerWidth/innerHeight;
+
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(
+                innerWidth,
+                innerHeight
+            );
         }
-
-      }
     );
 
 
-    mpCamera=
-      new Camera(
-        video,
-        {
+    /* =====================================================
+       MOUSE INTERACTION
+    ===================================================== */
 
-          onFrame:
-            async()=>{
+    addEventListener(
+        "pointermove",
+        e=>{
 
-              await hands.send({
-                image:video
-              });
+            mouseX =
+                (e.clientX/innerWidth-.5)*2;
 
-            },
-
-          width:1280,
-
-          height:720
-
+            mouseY =
+                (e.clientY/innerHeight-.5)*2;
         }
-      );
-
-
-    await mpCamera.start();
-
-
-    $("start").remove();
-
-
-    toast(
-      "UNIVERSE ONLINE"
     );
 
-  }
 
-  catch(e){
+    /* =====================================================
+       FIRST RENDER
+       IMPORTANT BUG FIX
+    ===================================================== */
 
-    console.error(e);
-
-
-    $("startBtn").disabled=false;
-
-
-    $("startBtn").textContent=
-      "TRY CAMERA AGAIN";
-
-
-    alert(
-
-      "Camera could not start."+
-      " Make sure Chrome has camera "+
-      "permission for this page."+
-      "\n\nError: "+
-      e.name+
-      " — "+
-      e.message
-
+    renderer.render(
+        scene,
+        camera
     );
-
-  }
-
 }
 
 
-/* ============================================================
-   BUTTON EVENTS
-   ============================================================ */
+/* =========================================================
+   STAR FIELD
+========================================================= */
 
-$("startBtn").onclick=
-  startCamera;
+function addStars(){
 
+    const g =
+        new THREE.BufferGeometry();
 
-$("prev").onclick=
-  ()=>setShape(-1);
+    const p =
+        new Float32Array(
+            2200*3
+        );
 
+    for(let i=0;i<2200;i++){
 
-$("next").onclick=
-  ()=>setShape(1);
+        const r =
+            rand(45,130);
 
+        const a =
+            Math.random()*TAU;
 
-$("color").onclick=
-  cycleColor;
+        const u =
+            rand(-1,1);
 
+        const s =
+            Math.sqrt(1-u*u);
 
-$("burst").onclick=
-  burst;
+        p[i*3] =
+            r*s*Math.cos(a);
 
+        p[i*3+1] =
+            r*u;
 
-$("random").onclick=
-  randomize;
+        p[i*3+2] =
+            r*s*Math.sin(a);
+    }
 
-
-$("reset").onclick=
-  reset;
-
-
-/* ============================================================
-   BLACK HOLE
-   ============================================================ */
-
-$("blackHole").onclick=()=>{
-
-  blackHole=
-    !blackHole;
-
-
-  setButton(
-    "blackHole",
-    blackHole
-  );
-
-
-  gravityEnabled=true;
-
-
-  setButton(
-    "gravity",
-    true
-  );
-
-
-  toast(
-    blackHole
-      ? "BLACK HOLE"
-      : "BLACK HOLE OFF"
-  );
-
-
-  updateEffects();
-
-};
-
-
-/* ============================================================
-   GRAVITY
-   ============================================================ */
-
-$("gravity").onclick=()=>{
-
-  gravityEnabled=
-    !gravityEnabled;
-
-
-  setButton(
-    "gravity",
-    gravityEnabled
-  );
-
-
-  if(!gravityEnabled)
-    gravityWell.active=false;
-
-
-  toast(
-    gravityEnabled
-      ? "GRAVITY ON"
-      : "GRAVITY OFF"
-  );
-
-
-  updateEffects();
-
-};
-
-
-/* ============================================================
-   FORCE FIELD
-   ============================================================ */
-
-$("force").onclick=()=>{
-
-  forceFieldEnabled=
-    !forceFieldEnabled;
-
-
-  setButton(
-    "force",
-    forceFieldEnabled
-  );
-
-
-  toast(
-    forceFieldEnabled
-      ? "FORCE FIELD"
-      : "FIELD OFF"
-  );
-
-
-  updateEffects();
-
-};
-
-
-/* ============================================================
-   NEBULA
-   ============================================================ */
-
-$("nebula").onclick=()=>{
-
-  nebulaMode=
-    !nebulaMode;
-
-
-  setButton(
-    "nebula",
-    nebulaMode
-  );
-
-
-  beginMorph(
-    nebulaMode
-      ? 9
-      : 0
-  );
-
-
-  toast(
-    nebulaMode
-      ? "NEBULA MODE"
-      : "SPHERE MODE"
-  );
-
-};
-
-
-/* ============================================================
-   AUDIO
-   ============================================================ */
-
-$("audio").onclick=
-  startAudio;
-
-
-/* ============================================================
-   TRAILS
-   ============================================================ */
-
-$("trails").onclick=()=>{
-
-  trailsEnabled=
-    !trailsEnabled;
-
-
-  setButton(
-    "trails",
-    trailsEnabled
-  );
-
-
-  updateEffects();
-
-};
-
-
-/* ============================================================
-   COLLISIONS
-   ============================================================ */
-
-$("collision").onclick=()=>{
-
-  collisionsEnabled=
-    !collisionsEnabled;
-
-
-  setButton(
-    "collision",
-    collisionsEnabled
-  );
-
-
-  toast(
-    collisionsEnabled
-      ? "COLLISION FIELD"
-      : "COLLISION OFF"
-  );
-
-
-  updateEffects();
-
-};
-
-
-/* ============================================================
-   ENVIRONMENT
-   ============================================================ */
-
-$("environment").onclick=()=>{
-
-  environmentIndex=
-    (
-      environmentIndex+
-      1
-    ) %
-    environments.length;
-
-
-  setEnvironment();
-
-};
-
-
-/* ============================================================
-   CINEMATIC
-   ============================================================ */
-
-$("cinematic").onclick=()=>{
-
-  cinematic=
-    !cinematic;
-
-
-  setButton(
-    "cinematic",
-    cinematic
-  );
-
-
-  toast(
-    cinematic
-      ? "CINEMATIC CAMERA"
-      : "CAMERA MANUAL"
-  );
-
-};
-
-
-/* ============================================================
-   PERFORMANCE
-   ============================================================ */
-
-$("performance").onclick=
-  setPerformanceMode;
-
-
-/* ============================================================
-   AUTO ROTATION
-   ============================================================ */
-
-$("auto").onclick=()=>{
-
-  auto=
-    !auto;
-
-
-  $("auto").textContent=
-    "Auto: "+
-    (
-      auto
-        ? "ON"
-        : "OFF"
+    g.setAttribute(
+        "position",
+        new THREE.BufferAttribute(p,3)
     );
 
-};
+    const m =
+        new THREE.PointsMaterial({
+
+            size:.05,
+
+            color:0x8fb5ff,
+
+            transparent:true,
+
+            opacity:.65
+        });
+
+    scene.add(
+        new THREE.Points(g,m)
+    );
+}
 
 
-/* ============================================================
-   CAMERA PREVIEW
-   ============================================================ */
+/* =========================================================
+   ANIMATION
+========================================================= */
 
-$("camToggle").onclick=()=>{
+function animate(){
 
-  showCam=
-    !showCam;
+    requestAnimationFrame(
+        animate
+    );
 
+    const delta =
+        Math.min(
+            clock.getDelta(),
+            .033
+        );
 
-  $("cameraBox").style.display=
-    showCam
-      ? "block"
-      : "none";
-
-};
-
-
-/* ============================================================
-   CONTROL MODE
-   ============================================================ */
-
-$("modeBtn").onclick=()=>{
-
-  controlMode=
-    (
-      controlMode+
-      1
-    ) %
-    controlModes.length;
+    const time =
+        clock.elapsedTime;
 
 
-  $("modeBtn").textContent=
-    "Mode: "+
-    controlModes[
-      controlMode
+    scale +=
+        (scaleTarget-scale)*.08;
+
+
+    universeX +=
+        (targetUniverseX-universeX)*.06;
+
+    universeY +=
+        (targetUniverseY-universeY)*.06;
+
+
+    burstEnergy *= .94;
+
+
+    const positions =
+        geometry.attributes.position.array;
+
+
+    for(let i=0;i<N;i++){
+
+        const j=i*3;
+
+
+        const wobble =
+            Math.sin(
+                time*1.7+
+                phaseArray[i]
+            )*.025;
+
+
+        /* TARGET POSITION */
+
+        const tx =
+            targetArray[j] *
+            scale;
+
+        const ty =
+            targetArray[j+1] *
+            scale;
+
+        const tz =
+            targetArray[j+2] *
+            scale;
+
+
+        /* SPRING FORCE */
+
+        const dx =
+            tx-positions[j];
+
+        const dy =
+            ty-positions[j+1];
+
+        const dz =
+            tz-positions[j+2];
+
+
+        velocityArray[j] +=
+            dx*.004;
+
+        velocityArray[j+1] +=
+            dy*.004;
+
+        velocityArray[j+2] +=
+            dz*.004;
+
+
+        /* HAND/MOUSE FIELD */
+
+        const localX =
+            positions[j] -
+            mouseX*7;
+
+        const localY =
+            positions[j+1] +
+            mouseY*5;
+
+        const distance =
+            Math.sqrt(
+                localX*localX+
+                localY*localY+
+                positions[j+2]*
+                positions[j+2]
+            );
+
+
+        if(distance<8){
+
+            const force =
+                (8-distance)/8*.0018;
+
+            velocityArray[j] -=
+                localX*force;
+
+            velocityArray[j+1] -=
+                localY*force;
+        }
+
+
+        /* DAMPING */
+
+        velocityArray[j] *= .91;
+        velocityArray[j+1] *= .91;
+        velocityArray[j+2] *= .91;
+
+
+        /* BURST */
+
+        if(burstEnergy>.01){
+
+            positions[j] +=
+                velocityArray[j]*
+                burstEnergy*3;
+
+            positions[j+1] +=
+                velocityArray[j+1]*
+                burstEnergy*3;
+
+            positions[j+2] +=
+                velocityArray[j+2]*
+                burstEnergy*3;
+        }
+
+
+        /* NORMAL MOVEMENT */
+
+        positions[j] +=
+            velocityArray[j] +
+            wobble*.15;
+
+        positions[j+1] +=
+            velocityArray[j+1] +
+            wobble;
+
+        positions[j+2] +=
+            velocityArray[j+2] -
+            wobble*.2;
+    }
+
+
+    geometry.attributes.position.needsUpdate=true;
+
+
+    /* =====================================================
+       UNIVERSE MOVEMENT
+    ===================================================== */
+
+    points.position.x =
+        universeX;
+
+    points.position.y =
+        universeY;
+
+
+    /* =====================================================
+       ROTATION
+    ===================================================== */
+
+    points.rotation.y +=
+        .0015 +
+        mouseX*.001;
+
+    points.rotation.x +=
+        (
+            mouseY*.15 -
+            points.rotation.x
+        )*.015;
+
+
+    if(auto){
+
+        points.rotation.z =
+            Math.sin(
+                time*.18
+            )*.05;
+    }
+
+
+    /* =====================================================
+       FPS
+    ===================================================== */
+
+    if(delta>0){
+
+        fpsEl.textContent =
+            Math.round(1/delta);
+    }
+
+
+    /* =====================================================
+       RENDER
+    ===================================================== */
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+
+/* =========================================================
+   PALM DETECTION
+========================================================= */
+
+function palmOpen(lm){
+
+    const wrist =
+        lm[0];
+
+    const tips =
+        [8,12,16,20];
+
+    const pips =
+        [6,10,14,18];
+
+    let count=0;
+
+
+    for(let k=0;k<4;k++){
+
+        const tip =
+            Math.hypot(
+                lm[tips[k]].x-wrist.x,
+                lm[tips[k]].y-wrist.y
+            );
+
+        const pip =
+            Math.hypot(
+                lm[pips[k]].x-wrist.x,
+                lm[pips[k]].y-wrist.y
+            );
+
+        if(
+            tip >
+            pip*1.08
+        ){
+            count++;
+        }
+    }
+
+
+    return count>=3;
+}
+
+
+/* =========================================================
+   HAND PROCESSING
+========================================================= */
+
+function processHand(lm){
+
+    handDetected=true;
+
+    handEl.textContent="ON";
+
+
+    const wrist =
+        lm[0];
+
+    const thumb =
+        lm[4];
+
+    const index =
+        lm[8];
+
+
+    /* =====================================================
+       PINCH
+    ===================================================== */
+
+    const pinch =
+        Math.hypot(
+            thumb.x-index.x,
+            thumb.y-index.y
+        );
+
+
+    scaleTarget =
+        THREE.MathUtils.clamp(
+            .65+
+            pinch/.20*2.25,
+            .65,
+            3.2
+        );
+
+
+    /* =====================================================
+       PALM
+    ===================================================== */
+
+    palmOpen =
+        palmOpenDetection(lm);
+
+
+    if(
+        palmOpen &&
+        !lastPalmOpen
+    ){
+
+        paletteIndex =
+            (paletteIndex+1)%
+            palettes.length;
+
+        setPalette();
+
+        toast("ENERGY COLOR");
+    }
+
+
+    lastPalmOpen =
+        palmOpen;
+
+
+    /* =====================================================
+       HAND POSITION
+    ===================================================== */
+
+    targetUniverseX =
+        (wrist.x-.5) *
+        -22;
+
+    targetUniverseY =
+        (wrist.y-.5) *
+        -15;
+
+
+    /* =====================================================
+       SWIPE DETECTION
+    ===================================================== */
+
+    const now =
+        performance.now();
+
+
+    if(lastPalmX!==null){
+
+        const dx =
+            wrist.x-lastPalmX;
+
+        const dy =
+            wrist.y-lastPalmY;
+
+        const dt =
+            Math.max(
+                16,
+                now-lastPalmTime
+            );
+
+
+        const speed =
+            Math.sqrt(
+                dx*dx+
+                dy*dy
+            )/dt;
+
+
+        /* HORIZONTAL SWIPE */
+
+        if(
+            swipeLock<=0 &&
+            Math.abs(dx)>.07 &&
+            Math.abs(dx)>
+            Math.abs(dy)*1.35 &&
+            speed>.00035
+        ){
+
+            if(dx<0){
+
+                setShape(1);
+
+            }else{
+
+                setShape(-1);
+            }
+
+
+            swipeLock=850;
+
+            lastPalmX=null;
+            lastPalmY=null;
+
+            gestureEl.textContent=
+                "SWIPE";
+
+            return;
+        }
+
+
+        /* VERTICAL SWIPE */
+
+        if(
+            swipeLock<=0 &&
+            Math.abs(dy)>.07 &&
+            Math.abs(dy)>
+            Math.abs(dx)*1.35 &&
+            speed>.00035
+        ){
+
+            if(dy<0){
+
+                targetUniverseY-=7;
+
+                toast("MOVE UP");
+
+            }else{
+
+                targetUniverseY+=7;
+
+                toast("MOVE DOWN");
+            }
+
+
+            swipeLock=850;
+
+            lastPalmX=null;
+            lastPalmY=null;
+
+            gestureEl.textContent=
+                "VERTICAL SWIPE";
+
+            return;
+        }
+    }
+
+
+    lastPalmX =
+        wrist.x;
+
+    lastPalmY =
+        wrist.y;
+
+    lastPalmTime =
+        now;
+
+
+    swipeLock =
+        Math.max(
+            0,
+            swipeLock -
+            16
+        );
+
+
+    /* =====================================================
+       HUD GESTURE
+    ===================================================== */
+
+    if(palmOpen){
+
+        gestureEl.textContent =
+            "OPEN PALM";
+
+    }else if(pinch<.055){
+
+        gestureEl.textContent =
+            "PINCH";
+
+    }else{
+
+        gestureEl.textContent =
+            "TRACKING";
+    }
+}
+
+
+/* =========================================================
+   SEPARATE PALM FUNCTION
+========================================================= */
+
+function palmOpenDetection(lm){
+
+    const wrist=lm[0];
+
+    const tips=[
+        8,
+        12,
+        16,
+        20
     ];
 
-
-  modeEl.textContent=
-    controlModes[
-      controlMode
+    const pips=[
+        6,
+        10,
+        14,
+        18
     ];
 
+    let openCount=0;
 
-  toast(
-    "MODE: "+
-    controlModes[
-      controlMode
-    ]
-  );
+    for(let i=0;i<4;i++){
 
-};
+        const tip =
+            Math.hypot(
+                lm[tips[i]].x-wrist.x,
+                lm[tips[i]].y-wrist.y
+            );
+
+        const pip =
+            Math.hypot(
+                lm[pips[i]].x-wrist.x,
+                lm[pips[i]].y-wrist.y
+            );
+
+        if(
+            tip >
+            pip*1.08
+        ){
+            openCount++;
+        }
+    }
+
+    return openCount>=3;
+}
 
 
-/* ============================================================
-   KEYBOARD CONTROLS
-   ============================================================ */
+/* =========================================================
+   NO HAND
+========================================================= */
+
+function noHand(){
+
+    handDetected=false;
+
+    handEl.textContent="OFF";
+
+    gestureEl.textContent=
+        "NO HAND";
+
+    lastPalmX=null;
+    lastPalmY=null;
+
+    scaleTarget +=
+        (1-scaleTarget)*.03;
+}
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+async function startCamera(){
+
+    const button =
+        $("startBtn");
+
+
+    button.disabled=true;
+
+    button.textContent=
+        "INITIALIZING CAMERA...";
+
+
+    try{
+
+        if(
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ){
+
+            throw new Error(
+                "Camera API unavailable"
+            );
+        }
+
+
+        cameraStream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video:{
+                    width:{
+                        ideal:1280
+                    },
+
+                    height:{
+                        ideal:720
+                    },
+
+                    facingMode:"user"
+                },
+
+                audio:false
+            });
+
+
+        const video =
+            $("video");
+
+
+        video.srcObject =
+            cameraStream;
+
+
+        await video.play();
+
+
+        const hands =
+            new Hands({
+
+                locateFile:
+                    file =>
+                    `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+
+        hands.setOptions({
+
+            maxNumHands:1,
+
+            modelComplexity:1,
+
+            minDetectionConfidence:.65,
+
+            minTrackingConfidence:.62
+        });
+
+
+        hands.onResults(
+            results=>{
+
+                if(
+                    results.multiHandLandmarks &&
+                    results.multiHandLandmarks.length
+                ){
+
+                    processHand(
+                        results.multiHandLandmarks[0]
+                    );
+
+                }else{
+
+                    noHand();
+                }
+            }
+        );
+
+
+        mpCamera =
+            new Camera(
+                video,
+                {
+
+                    onFrame:
+                    async()=>{
+                        await hands.send({
+                            image:video
+                        });
+                    },
+
+                    width:1280,
+
+                    height:720
+                }
+            );
+
+
+        await mpCamera.start();
+
+
+        $("start").remove();
+
+        toast(
+            "UNIVERSE ONLINE"
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+
+        button.disabled=false;
+
+        button.textContent=
+            "TRY CAMERA AGAIN";
+
+
+        alert(
+            "Camera could not start.\n\n"+
+            "The particle universe itself is still working.\n\n"+
+            "Error: "+
+            error.name+
+            " — "+
+            error.message
+        );
+    }
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+$("startBtn").onclick =
+    startCamera;
+
+
+$("prev").onclick =
+    ()=>setShape(-1);
+
+
+$("next").onclick =
+    ()=>setShape(1);
+
+
+$("color").onclick =
+    ()=>{
+
+        paletteIndex =
+            (paletteIndex+1)%
+            palettes.length;
+
+        setPalette();
+
+        toast("COLOR SHIFT");
+    };
+
+
+$("burst").onclick =
+    burst;
+
+
+$("random").onclick =
+    ()=>{
+
+        for(let i=0;i<N;i++){
+
+            const j=i*3;
+
+            targetArray[j] +=
+                rand(-2,2);
+
+            targetArray[j+1] +=
+                rand(-2,2);
+
+            targetArray[j+2] +=
+                rand(-2,2);
+        }
+
+        toast("RANDOMIZED");
+    };
+
+
+$("reset").onclick =
+    reset;
+
+
+$("camToggle").onclick =
+    ()=>{
+
+        showCamera =
+            !showCamera;
+
+        $("cameraBox").style.display =
+            showCamera
+            ?"block"
+            :"none";
+    };
+
+
+$("auto").onclick =
+    ()=>{
+
+        auto=!auto;
+
+        $("auto").textContent =
+            "Auto: "+
+            (auto?"ON":"OFF");
+    };
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
 
 addEventListener(
-  "keydown",
-  e=>{
+    "keydown",
+    e=>{
 
-    if(
-      e.code==="Space"
-    ){
+        if(e.code==="Space"){
 
-      e.preventDefault();
+            e.preventDefault();
 
-      burst();
+            burst();
+        }
 
+
+        if(
+            e.key.toLowerCase()==="r"
+        ){
+
+            reset();
+        }
+
+
+        if(
+            e.key==="ArrowLeft"
+        ){
+
+            setShape(-1);
+        }
+
+
+        if(
+            e.key==="ArrowRight"
+        ){
+
+            setShape(1);
+        }
+
+
+        if(
+            e.key==="ArrowUp"
+        ){
+
+            targetUniverseY-=5;
+        }
+
+
+        if(
+            e.key==="ArrowDown"
+        ){
+
+            targetUniverseY+=5;
+        }
     }
-
-
-    if(
-      e.key.toLowerCase()==="r"
-    ){
-
-      reset();
-
-    }
-
-
-    if(
-      e.key==="ArrowLeft"
-    ){
-
-      setShape(-1);
-
-    }
-
-
-    if(
-      e.key==="ArrowRight"
-    ){
-
-      setShape(1);
-
-    }
-
-
-    if(
-      e.key.toLowerCase()==="m"
-    ){
-
-      controlMode=
-        (
-          controlMode+
-          1
-        ) %
-        controlModes.length;
-
-
-      $("modeBtn").textContent=
-        "Mode: "+
-        controlModes[
-          controlMode
-        ];
-
-
-      modeEl.textContent=
-        controlModes[
-          controlMode
-        ];
-
-    }
-
-
-    if(
-      e.key.toLowerCase()==="b"
-    ){
-
-      blackHole=
-        !blackHole;
-
-
-      setButton(
-        "blackHole",
-        blackHole
-      );
-
-
-      updateEffects();
-
-    }
-
-  }
 );
 
 
-/* ============================================================
-   START
-   ============================================================ */
+/* =========================================================
+   START THE 3D ENGINE
+   IMPORTANT: THIS HAPPENS BEFORE CAMERA
+========================================================= */
 
 init();
 
